@@ -1,4 +1,5 @@
-QT += core gui widgets multimedia multimediawidgets
+QT += core gui widgets multimedia multimediawidgets \
+    quick
 
 CONFIG += c++11
 
@@ -8,14 +9,20 @@ CONFIG += c++11
 # DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        main.cpp \
         record_video.cpp \
+        settings.cpp \
         the_button.cpp \
         the_player.cpp \
-        tomeo.cpp
+        tomeo.cpp \
+        video_test.cpp
 
 HEADERS += \
+    record_video.h \
+    settings.h \
     the_button.h \
-    the_player.h
+    the_player.h \
+    video_test.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
