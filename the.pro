@@ -10,10 +10,16 @@ CONFIG += c++11
 SOURCES += \
         the_button.cpp \
         the_player.cpp \
+        settings.cpp \
+        record_video.cpp \
+        video_test.cpp \
         tomeo.cpp
 
 HEADERS += \
+    record_video.h \
     the_button.h \
+    settings.h \
+    video_test.h \
     the_player.h
 
 # Default rules for deployment.

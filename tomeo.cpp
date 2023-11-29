@@ -23,8 +23,10 @@
 #include <QMessageBox>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
+#include <QPropertyAnimation>
 #include "the_player.h"
 #include "the_button.h"
+#include "settings.h"
 
 // read in videos and thumbnails to this directory
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
@@ -141,9 +143,47 @@ int main(int argc, char *argv[]) {
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
 
+    // Create a button to show the settings page
+    QPushButton *settingsButton = new QPushButton("Settings", &window);
+    settingsButton->setMaximumSize(100, 100);
+    top->addWidget(settingsButton);
+
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
     top->addWidget(buttonWidget);
+
+    // create layout for the settings
+    QVBoxLayout *settingsLayout = new QVBoxLayout();
+    Settings *settings = new Settings(&window);
+    settings->setAttribute(Qt::WA_DeleteOnClose);
+    settings->setFixedSize(400, 1000000);
+    settings->setLayout(settingsLayout);
+    window.setLayout(settingsLayout);
+
+    // Connect the button click to the animation
+    QObject::connect(settingsButton, &QPushButton::clicked, [=]() {
+        if (!settings->isVisible()) {
+            // If settings is not visible, show it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
+            animation->setDuration(500); // Set the duration of the animation in milliseconds
+            animation->setStartValue(settings->geometry());
+            animation->setEndValue(QRect(0, 0, settings->width(), settings->height()));
+            animation->start();
+            settings->show();
+            settings->raise();
+        } else {
+            // If settings is visible, hide it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
+            animation->setDuration(500);
+            animation->setStartValue(settings->geometry());
+            animation->setEndValue(QRect(-settings->width(), 0, settings->width(), settings->height()));
+            animation->start();
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                settings->hide();
+            });
+        }
+    });
 
     // showtime!
     window.show();
