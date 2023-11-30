@@ -29,15 +29,9 @@
 // read in videos and thumbnails to this directory
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 
-    //loc = "C:\\Users\\russe\\OneDrive\\Y2\\S1\\User_Interfaces\\2811_cw3-master-release-lowresbck\\videos";
-
     std::vector<TheButtonInfo> out =  std::vector<TheButtonInfo>();
-    //qDebug() << "dir pass" <<QString::fromStdString(loc);
     QDir dir(QString::fromStdString(loc) );
-    //qDebug() << dir.exists();
-    //qDebug() << dir.absolutePath();
     QDirIterator it(dir);
-    //qDebug() << it.next();
 
     while (it.hasNext()) { // for all files
 
@@ -46,25 +40,25 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
         if (f.contains("."))
 
 #if defined(_WIN32)
-            if (f.contains(".wmv"))  { // windows
+        if (f.contains(".wmv"))  { // windows
 #else
-            if (f.contains(".mp4") || f.contains("MOV"))  { // mac/linux
+        if (f.contains(".mp4") || f.contains("MOV"))  { // mac/linux
 #endif
 
             QString thumb = f.left( f .length() - 4) +".png";
             if (QFile(thumb).exists()) { // if a png thumbnail exists
                 QImageReader *imageReader = new QImageReader(thumb);
-                    QImage sprite = imageReader->read(); // read the thumbnail
-                    if (!sprite.isNull()) {
-                        QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
-                        QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
-                        out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
-                    }
-                    else
-                        qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
+                QImage sprite = imageReader->read(); // read the thumbnail
+                if (!sprite.isNull()) {
+                    QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
+                    QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
+                    out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
+                }
+                else
+                    qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb <<Qt::endl;
             }
             else
-                qDebug() << "warning: skipping video because I couldn't find thumbnail " << thumb << endl;
+                qDebug() << "warning: skipping video because I couldn't find thumbnail " << thumb << Qt::endl;
         }
     }
 
@@ -75,7 +69,7 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 int main(int argc, char *argv[]) {
 
     // let's just check that Qt is operational first
-    qDebug() << "Qt version: " << QT_VERSION_STR << endl;
+    qDebug() << "Qt version: " << QT_VERSION_STR <<Qt::endl;
 
     // create the Qt Application
     QApplication app(argc, argv);
@@ -83,31 +77,22 @@ int main(int argc, char *argv[]) {
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
-    // Print out the argument passed to the application
-    if (argc > 1) {
-        qDebug() << "Argument passed to the application: " << argv[1] << endl;
-    } else {
-        qDebug() << "No argument passed to the application." << endl;
-    }
-
     if (argc == 2)
-    {
-        std::cout << std::string(argv[1]) ;
         videos = getInfoIn( std::string(argv[1]) );
-    }
 
     if (videos.size() == 0) {
 
-        //const int result = QMessageBox::information( swapped to remove error message
-        QMessageBox::information(
-                    NULL,
-                    QString("Tomeo"),
-                    QString("no videos found! Add command line argument to \"quoted\" file location."));
+        const int result = QMessageBox::information(
+            NULL,
+            QString("Tomeo"),
+            QString("no videos found! Add command line argument to \"quoted\" file location."));
         exit(-1);
     }
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
+
+    videoWidget->setFixedSize(500, 900);
 
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer;
@@ -120,6 +105,10 @@ int main(int argc, char *argv[]) {
     // the buttons are arranged horizontally
     QHBoxLayout *layout = new QHBoxLayout();
     buttonWidget->setLayout(layout);
+
+    // Adjust button size policy
+    QSizePolicy buttonSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    buttonSizePolicy.setHorizontalStretch(1);
 
 
     // create the four buttons
@@ -139,7 +128,8 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *top = new QVBoxLayout();
     window.setLayout(top);
     window.setWindowTitle("tomeo");
-    window.setMinimumSize(800, 680);
+    window.setMinimumSize(540, 960);
+    window.setMaximumSize(540, 960);
 
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
