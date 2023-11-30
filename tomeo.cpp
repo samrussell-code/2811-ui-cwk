@@ -23,27 +23,34 @@
 #include <QMessageBox>
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
+#include <QFileDialog>
 #include "the_player.h"
 #include "the_button.h"
+
+// get directory from file explorer interface
+QString getVideoDirectory() {
+    QString dir = QFileDialog::getExistingDirectory(
+        NULL,
+        "Select Video Directory",
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    return dir;
+}
+
 
 // read in videos and thumbnails to this directory
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 
-    //loc = "C:\\Users\\russe\\OneDrive\\Y2\\S1\\User_Interfaces\\2811_cw3-master-release-lowresbck\\videos";
-
     std::vector<TheButtonInfo> out =  std::vector<TheButtonInfo>();
-    //qDebug() << "dir pass" <<QString::fromStdString(loc);
     QDir dir(QString::fromStdString(loc) );
-    //qDebug() << dir.exists();
-    //qDebug() << dir.absolutePath();
     QDirIterator it(dir);
-    //qDebug() << it.next();
 
     while (it.hasNext()) { // for all files
 
         QString f = it.next();
 
-        if (f.contains("."))
+            if (f.contains("."))
 
 #if defined(_WIN32)
             if (f.contains(".wmv"))  { // windows
@@ -61,10 +68,10 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
                         out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
                     }
                     else
-                        qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
+                        qDebug() << "Warning: Could not process thumbnail for video: " << f << ". Thumbnail might be in an unsupported format." << endl;
             }
             else
-                qDebug() << "warning: skipping video because I couldn't find thumbnail " << thumb << endl;
+                qDebug() << "Warning: Could not find thumbnail for video: " << f << "." << endl;
         }
     }
 
@@ -83,27 +90,27 @@ int main(int argc, char *argv[]) {
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
-    // Print out the argument passed to the application
-    if (argc > 1) {
-        qDebug() << "Argument passed to the application: " << argv[1] << endl;
-    } else {
-        qDebug() << "No argument passed to the application." << endl;
-    }
-
     if (argc == 2)
-    {
-        std::cout << std::string(argv[1]) ;
         videos = getInfoIn( std::string(argv[1]) );
-    }
 
-    if (videos.size() == 0) {
+    if (videos.empty()) {
+        QMessageBox::warning(
+            NULL,
+            "Tomeo",
+            "No videos found in the provided directory or directory doesn't exist.\nPlease select a directory with videos.");
 
-        //const int result = QMessageBox::information( swapped to remove error message
-        QMessageBox::information(
-                    NULL,
-                    QString("Tomeo"),
-                    QString("no videos found! Add command line argument to \"quoted\" file location."));
-        exit(-1);
+        QString selected_dir = getVideoDirectory();
+        if (!selected_dir.isEmpty()) {
+            videos = getInfoIn(selected_dir.toStdString());
+        }
+
+        if (videos.empty()) {
+            QMessageBox::critical(
+                NULL,
+                "Tomeo",
+                "No videos found. The application will now exit.");
+            exit(-1);
+        }
     }
 
     // the widget that will show the video
