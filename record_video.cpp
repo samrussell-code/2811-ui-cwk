@@ -1,10 +1,12 @@
 #include "record_video.h"
+#include "qcamerainfo.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QCameraViewfinder>
 #include <QMultimedia>
+#include <QComboBox>
 
 RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
 {
@@ -27,6 +29,17 @@ RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
     recordButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/record.png"), "");
     flipButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/flip_dark.png"), "");
 
+    cameraComboBox = new QComboBox();
+
+    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    foreach (const QCameraInfo &cameraInfo, cameras) {
+        qDebug() << "Name: " << cameraInfo.description();
+        cameraComboBox->addItem(cameraInfo.description(), QVariant::fromValue(cameraInfo));
+    }
+
+    connect(cameraComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [=](int index) { switchCamera(index); });
+
     QString buttonStyle = "QPushButton{border:none;background-color:rgba(255, 255, 255,100);}";
     recordButton->setStyleSheet(buttonStyle); // Style sheet
     recordButton->setIconSize(QSize(75, 75));
@@ -41,6 +54,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
     QPushButton *toggleModeButton = new QPushButton("Toggle Mode");
     connect(toggleModeButton, &QPushButton::clicked, this, &RecordVideo::toggleRecordingMode);
 
+    rightLayout->addWidget(cameraComboBox);
     rightLayout->addWidget(flipButton);
     rightLayout->addWidget(recordButton);
     rightLayout->addWidget(toggleModeButton);
@@ -94,11 +108,11 @@ void RecordVideo::updateCameraSettings()
 
     if (verticalMode)
     {
-        videoSettings.setResolution(720, 1280); // Vertical mode
+        videoSettings.setResolution(720, 1280);
     }
     else
     {
-        videoSettings.setResolution(1280, 720); // Horizontal mode
+        videoSettings.setResolution(1280, 720);
     }
 
     recorder->setVideoSettings(videoSettings);
@@ -123,4 +137,15 @@ void RecordVideo::updateViewfinderSettings()
     }
 
     camera->setViewfinderSettings(viewfinderSettings);
+}
+
+void RecordVideo::switchCamera(int index)
+{
+    currentCameraInfo = cameraComboBox->itemData(index).value<QCameraInfo>();
+    camera->stop();
+    camera = new QCamera(currentCameraInfo);
+    camera->setViewfinder(viewfinder);
+    camera->start();
+    updateCameraSettings();
+    updateViewfinderSettings();
 }
