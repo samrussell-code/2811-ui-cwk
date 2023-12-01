@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
     window.setLayout(top);
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
+    // https://stackoverflow.com/questions/14943715/qwidget-reports-wrong-width-value/14944640#14944640
     //window.setFixedSize(1280,720);
 
     // Create a button to show the settings page
