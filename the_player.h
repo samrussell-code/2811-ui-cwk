@@ -29,7 +29,7 @@ public:
     }
 
     // all buttons have been setup, store pointers here
-    void setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i);
+    void setContent(std::vector<TheButtonInfo>* i);
 
 private slots:
 
@@ -41,6 +41,8 @@ public slots:
 
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
+    void nextVideo();
+
 };
 
 #endif //CW2_THE_PLAYER_H

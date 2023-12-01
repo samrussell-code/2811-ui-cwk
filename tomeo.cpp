@@ -89,40 +89,6 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    // the widget that will show the video
-    QVideoWidget *videoWidget = new QVideoWidget;
-
-    videoWidget->setFixedSize(500, 900);
-
-    // the QMediaPlayer which controls the playback
-    ThePlayer *player = new ThePlayer;
-    player->setVideoOutput(videoWidget);
-
-    // a row of buttons
-    QWidget *buttonWidget = new QWidget();
-    // a list of the buttons
-    std::vector<TheButton*> buttons;
-    // the buttons are arranged horizontally
-    QHBoxLayout *layout = new QHBoxLayout();
-    buttonWidget->setLayout(layout);
-
-    // Adjust button size policy
-    QSizePolicy buttonSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    buttonSizePolicy.setHorizontalStretch(1);
-
-
-    // create the four buttons
-    for ( int i = 0; i < 4; i++ ) {
-        TheButton *button = new TheButton(buttonWidget);
-        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
-        buttons.push_back(button);
-        layout->addWidget(button);
-        button->init(&videos.at(i));
-    }
-
-    // tell the player what buttons and videos are available
-    player->setContent(&buttons, & videos);
-
     // create the main window and layout
     QWidget window;
     QVBoxLayout *top = new QVBoxLayout();
@@ -131,9 +97,31 @@ int main(int argc, char *argv[]) {
     window.setMinimumSize(540, 960);
     window.setMaximumSize(540, 960);
 
-    // add the video and the buttons to the top level widget
+    // the widget that will show the video
+    QVideoWidget *videoWidget = new QVideoWidget;
+    videoWidget->setFixedSize(500, 900);
+
+    // the QMediaPlayer which controls the playback
+    ThePlayer *player = new ThePlayer;
+    player->setVideoOutput(videoWidget);
+
+    // tell the player what videos are available
+    player->setContent(&videos);
+
+    // Add the video widget to the top level widget
     top->addWidget(videoWidget);
-    top->addWidget(buttonWidget);
+
+    // create the down arrow button
+    QPushButton *downArrowButton = new QPushButton("Next Video");
+    downArrowButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    // Connect the down arrow button to a slot that changes the video
+    QObject::connect(downArrowButton, &QPushButton::clicked, [player](){
+        player->nextVideo();
+    });
+
+    // Add the down arrow button to the main window layout
+    top->addWidget(downArrowButton);
 
     // showtime!
     window.show();

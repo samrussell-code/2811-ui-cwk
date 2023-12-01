@@ -5,10 +5,11 @@
 #include "the_player.h"
 
 // all buttons have been setup, store pointers here
-void ThePlayer::setContent(std::vector<TheButton*>* b, std::vector<TheButtonInfo>* i) {
-    buttons = b;
+void ThePlayer::setContent(std::vector<TheButtonInfo>* i) {
     infos = i;
-    jumpTo(buttons -> at(0) -> info);
+    if (infos && !infos->empty()) {
+        jumpTo(&infos->at(0)); // Start with the first video
+    }
 }
 
 void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
@@ -24,4 +25,12 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
+}
+
+void ThePlayer::nextVideo() {
+    if (infos != nullptr && !infos->empty()) {
+        // Increment the current video index and wrap around if needed
+        updateCount = (updateCount + 1) % infos->size();
+        jumpTo(&infos->at(updateCount));
+    }
 }
