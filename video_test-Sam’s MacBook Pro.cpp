@@ -1,12 +1,11 @@
 #include "video_test.h"
-#include <QtMultimedia/QCameraInfo>
-#include <QMessageBox>
 
 VideoTest::VideoTest(QWidget *parent) :
     QMainWindow(parent),
     camera(new QCamera(this)),
     viewfinder(new QCameraViewfinder(this))
 {
+
     camera->setViewfinder(viewfinder);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -17,20 +16,16 @@ VideoTest::VideoTest(QWidget *parent) :
 
     setCentralWidget(centralWidget);
 
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    foreach (const QCameraInfo &cameraInfo, cameras) {
-        qDebug() << "Name: " << cameraInfo.deviceName();
-        qDebug() << "Position: " << cameraInfo.position();
-        qDebug() << "Orientation: " << cameraInfo.orientation();
-    }
-
     // Start the camera
     camera->start();
-    if (camera->status() == QCamera::Status::ActiveStatus) {
+    qDebug() << "Camera state:" << camera->state();
+    qDebug() << "Camera status:" << camera->status();
+    if (camera->status() == QCamera::ActiveStatus) {
         qDebug() << "Camera started successfully";
     } else {
         qDebug() << "Error starting camera:" << camera->errorString();
     }
+
 }
 
 VideoTest::~VideoTest()

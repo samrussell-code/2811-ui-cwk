@@ -1,3 +1,5 @@
+// record_video.h
+
 #ifndef RECORDVIDEO_H
 #define RECORDVIDEO_H
 
@@ -17,6 +19,11 @@ public:
     explicit RecordVideo(QWidget *parent = nullptr);
     ~RecordVideo();
 
+private slots:
+    void toggleRecordingMode();
+    void updateCameraSettings();
+    void updateViewfinderSettings();
+
 private:
     void setupCamera();
 
@@ -28,9 +35,11 @@ private:
     QVBoxLayout *rightLayout;
     QVBoxLayout *eventInfoLayout;
 
-    QLabel *label;
-    QPushButton *searchButton;
-    QPushButton *closeButton;
+    QLabel *schedule_time;
+    QPushButton *recordButton;
+    QPushButton *flipButton;
+
+    bool verticalMode;
 };
 
-#endif // MAINWINDOW_H
+#endif // RECORDVIDEO_H

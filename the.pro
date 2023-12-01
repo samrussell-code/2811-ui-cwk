@@ -24,12 +24,15 @@ HEADERS += \
     the_player.h \
     video_test.h
 
+QMAKE_INFO_PLIST = Info.plist
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
+    Info.plist \
     videos/a.MOV \
     videos/a.png \
     videos/a.wmv \
@@ -50,5 +53,8 @@ DISTFILES += \
     videos/f.wmv \
     videos/g.mp4 \
     videos/g.png \
-    videos/g.wmv
+    videos/g.wmv \
+    icons/flip_dark.png \
+    icons/flip_light.png \
+    icons/record.png
 
