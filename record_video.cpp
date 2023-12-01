@@ -7,8 +7,9 @@
 #include <QCameraViewfinder>
 #include <QMultimedia>
 #include <QComboBox>
+#include <QPalette>
 
-RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
+RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
 {
     setupCamera();
 
@@ -17,6 +18,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
     leftLayout = new QVBoxLayout();
     rightLayout = new QVBoxLayout();
     eventInfoLayout = new QVBoxLayout();
+    this->setAutoFillBackground(true); // background fill
 
     schedule_time = new QLabel("00:00:00");
     schedule_time->setMaximumHeight(20);
@@ -62,11 +64,10 @@ RecordVideo::RecordVideo(QWidget *parent) : QMainWindow(parent)
     topLayout->addLayout(leftLayout);
     topLayout->addLayout(rightLayout);
 
-    centralWidget->setLayout(topLayout);
-    setCentralWidget(centralWidget);
+    setLayout(topLayout);
 
-    setWindowTitle("tomeo");
-    setMinimumSize(1280, 720);
+    //setWindowTitle("tomeo");
+    setMinimumSize(1280,720);
 }
 
 RecordVideo::~RecordVideo()
