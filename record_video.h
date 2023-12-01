@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+
 Q_DECLARE_METATYPE(QCameraInfo)
 
 class RecordVideo : public QMainWindow
