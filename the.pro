@@ -48,5 +48,8 @@ DISTFILES += \
     videos/f.wmv \
     videos/g.mp4 \
     videos/g.png \
-    videos/g.wmv
+    videos/g.wmv \
+    icons/record.png \
+    icons/flip_light.png \
+    icons/flip_dark.png
 

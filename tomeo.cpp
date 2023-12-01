@@ -24,6 +24,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QPropertyAnimation>
+#include "record_video.h"
 #include "the_player.h"
 #include "the_button.h"
 #include "settings.h"
@@ -148,6 +149,11 @@ int main(int argc, char *argv[]) {
     settingsButton->setMaximumSize(100, 100);
     top->addWidget(settingsButton);
 
+    // Create a button to show the record video page
+    QPushButton *recordVideoButton = new QPushButton("Record Video", &window);
+    recordVideoButton->setMaximumSize(100, 100);
+    top->addWidget(recordVideoButton);
+
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
     top->addWidget(buttonWidget);
@@ -159,6 +165,15 @@ int main(int argc, char *argv[]) {
     settings->setFixedSize(400, 1000000);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
+
+    // create layout for the record video
+    QVBoxLayout *recordVideoLayout = new QVBoxLayout();
+    RecordVideo *recordVideo = new RecordVideo(&window);
+    recordVideo->setAttribute(Qt::WA_DeleteOnClose);
+    recordVideo->setLayout(recordVideoLayout);
+    window.setLayout(recordVideoLayout);
+
+    // we should generalise this animation and window setup for less code repetition.
 
     // Connect the button click to the animation
     QObject::connect(settingsButton, &QPushButton::clicked, [=]() {
@@ -181,6 +196,31 @@ int main(int argc, char *argv[]) {
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 settings->hide();
+            });
+        }
+    });
+
+    // Connect the record_video button click to the animation
+    QObject::connect(recordVideoButton, &QPushButton::clicked, [=]() {
+        if (!recordVideo->isVisible()) {
+            // If settings is not visible, show it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
+            animation->setDuration(500); // Set the duration of the animation in milliseconds
+            animation->setStartValue(recordVideo->geometry());
+            animation->setEndValue(QRect(0, 0, recordVideo->width(), recordVideo->height()));
+            animation->start();
+            recordVideo->show();
+            recordVideo->raise();
+        } else {
+            // If settings is visible, hide it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
+            animation->setDuration(500);
+            animation->setStartValue(recordVideo->geometry());
+            animation->setEndValue(QRect(-recordVideo->width(), 0, recordVideo->width(), recordVideo->height()));
+            animation->start();
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                recordVideo->hide();
             });
         }
     });
