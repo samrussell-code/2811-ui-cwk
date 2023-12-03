@@ -1,6 +1,6 @@
 #include "video_test.h"
+
 #include <QtMultimedia/QCameraInfo>
-#include <QMessageBox>
 
 VideoTest::VideoTest(QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +31,7 @@ VideoTest::VideoTest(QWidget *parent) :
     } else {
         qDebug() << "Error starting camera:" << camera->errorString();
     }
+
 }
 
 VideoTest::~VideoTest()
