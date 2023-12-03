@@ -49,22 +49,22 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
         if (f.contains("."))
 
 #if defined(_WIN32)
-            if (f.contains(".wmv"))  { // windows
+        if (f.contains(".wmv"))  { // windows
 #else
-            if (f.contains(".mp4") || f.contains("MOV"))  { // mac/linux
+        if (f.contains(".mp4") || f.contains("MOV"))  { // mac/linux
 #endif
 
             QString thumb = f.left( f .length() - 4) +".png";
             if (QFile(thumb).exists()) { // if a png thumbnail exists
                 QImageReader *imageReader = new QImageReader(thumb);
-                    QImage sprite = imageReader->read(); // read the thumbnail
-                    if (!sprite.isNull()) {
-                        QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
-                        QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
-                        out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
-                    }
-                    else
-                        qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
+                QImage sprite = imageReader->read(); // read the thumbnail
+                if (!sprite.isNull()) {
+                    QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
+                    QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
+                    out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
+                }
+                else
+                    qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;
             }
             else
                 qDebug() << "warning: skipping video because I couldn't find thumbnail " << thumb << endl;
@@ -103,9 +103,9 @@ int main(int argc, char *argv[]) {
 
         //const int result = QMessageBox::information( swapped to remove error message
         QMessageBox::information(
-                    NULL,
-                    QString("Tomeo"),
-                    QString("no videos found! Add command line argument to \"quoted\" file location."));
+            NULL,
+            QString("Tomeo"),
+            QString("no videos found! Add command line argument to \"quoted\" file location."));
         exit(-1);
     }
 
@@ -143,6 +143,8 @@ int main(int argc, char *argv[]) {
     window.setLayout(top);
     window.setWindowTitle("tomeo");
     window.setMinimumSize(800, 680);
+    // https://stackoverflow.com/questions/14943715/qwidget-reports-wrong-width-value/14944640#14944640
+    //window.setFixedSize(1280,720);
 
     // Create a button to show the settings page
     QPushButton *settingsButton = new QPushButton("Settings", &window);
@@ -170,6 +172,8 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *recordVideoLayout = new QVBoxLayout();
     RecordVideo *recordVideo = new RecordVideo(&window);
     recordVideo->setAttribute(Qt::WA_DeleteOnClose);
+    recordVideo->hide();
+    recordVideo->setMinimumSize(window.size());
     recordVideo->setLayout(recordVideoLayout);
     window.setLayout(recordVideoLayout);
 
@@ -211,6 +215,7 @@ int main(int argc, char *argv[]) {
             animation->start();
             recordVideo->show();
             recordVideo->raise();
+            recordVideoButton->raise(); // currently just raising the button to easily close the layout
         } else {
             // If settings is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");

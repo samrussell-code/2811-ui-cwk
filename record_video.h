@@ -3,6 +3,7 @@
 
 #include "qcamerainfo.h"
 #include <QMainWindow>
+#include <QWidget>
 #include <QtMultimedia/QCamera>
 #include <QtMultimediaWidgets/QCameraViewfinder>
 #include <QtMultimedia/QMediaRecorder>
@@ -13,7 +14,7 @@
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
-class RecordVideo : public QMainWindow
+class RecordVideo : public QWidget
 {
     Q_OBJECT
 
