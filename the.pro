@@ -51,5 +51,6 @@ DISTFILES += \
     videos/g.wmv \
     icons/record.png \
     icons/flip_light.png \
-    icons/flip_dark.png
+    icons/flip_dark.png \
+    icons/down_arrow.png
 

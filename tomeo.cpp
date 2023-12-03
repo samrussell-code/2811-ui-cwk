@@ -143,7 +143,8 @@ int main(int argc, char *argv[]) {
     player->setContent(&videos);
 
     // create the down arrow button
-    QPushButton *downArrowButton = new QPushButton("Next Video");
+    QPushButton *downArrowButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/down_arrow.png"), "");
+    downArrowButton->setIconSize(QSize(75, 25));
     downArrowButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     // Connect the down arrow button to a slot that changes the video
