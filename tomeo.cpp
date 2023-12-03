@@ -111,40 +111,35 @@ int main(int argc, char *argv[]) {
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
+    videoWidget->setFixedSize(774, 900);
 
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer;
     player->setVideoOutput(videoWidget);
+    // tell the player what videos are available
+    player->setContent(&videos);
 
-    // a row of buttons
-    QWidget *buttonWidget = new QWidget();
-    // a list of the buttons
-    std::vector<TheButton*> buttons;
-    // the buttons are arranged horizontally
-    QHBoxLayout *layout = new QHBoxLayout();
-    buttonWidget->setLayout(layout);
+    // create the down arrow button
+    QPushButton *downArrowButton = new QPushButton("Next Video");
+    downArrowButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+
+    // Connect the down arrow button to a slot that changes the video
+    QObject::connect(downArrowButton, &QPushButton::clicked, [player](){
+        player->nextVideo();
+    });
 
 
-    // create the four buttons
-    for ( int i = 0; i < 4; i++ ) {
-        TheButton *button = new TheButton(buttonWidget);
-        button->connect(button, SIGNAL(jumpTo(TheButtonInfo* )), player, SLOT (jumpTo(TheButtonInfo*))); // when clicked, tell the player to play.
-        buttons.push_back(button);
-        layout->addWidget(button);
-        button->init(&videos.at(i));
-    }
-
-    // tell the player what buttons and videos are available
-    player->setContent(&buttons, & videos);
 
     // create the main window and layout
     QWidget window;
     QVBoxLayout *top = new QVBoxLayout();
     window.setLayout(top);
     window.setWindowTitle("tomeo");
-    window.setMinimumSize(800, 680);
+    window.setMinimumSize(800, 1040);
     // https://stackoverflow.com/questions/14943715/qwidget-reports-wrong-width-value/14944640#14944640
     //window.setFixedSize(1280,720);
+
+
 
     // Create a button to show the settings page
     QPushButton *settingsButton = new QPushButton("Settings", &window);
@@ -158,7 +153,9 @@ int main(int argc, char *argv[]) {
 
     // add the video and the buttons to the top level widget
     top->addWidget(videoWidget);
-    top->addWidget(buttonWidget);
+
+    // Add the down arrow button to the main window layout
+    top->addWidget(downArrowButton);
 
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();

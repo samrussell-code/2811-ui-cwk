@@ -67,7 +67,10 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
     setLayout(topLayout);
 
     //setWindowTitle("tomeo");
-    setMinimumSize(1280,720);
+    // THIS ONLY WORKS BECAUSE IT IS THE SAME SIZE AS THE WINDOW ON STARTUP
+    // IF YOU EXPAND THE WINDOW, OR INCREASE THIS SIZE, THE LAYOUT WILL
+    // EXCEED THE BOUNDS OF THE WINDOW
+    setMinimumSize(774,1040);
 }
 
 RecordVideo::~RecordVideo()
