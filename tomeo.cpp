@@ -22,12 +22,24 @@
 #include <QImageReader>
 #include <QMessageBox>
 #include <QtCore/QDir>
+#include <QFileDialog>
 #include <QtCore/QDirIterator>
 #include <QPropertyAnimation>
 #include "record_video.h"
 #include "the_player.h"
 #include "the_button.h"
 #include "settings.h"
+
+// get directory from file explorer interface
+QString getVideoDirectory() {
+    QString dir = QFileDialog::getExistingDirectory(
+        NULL,
+        "Select Video Directory",
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    return dir;
+}
 
 // read in videos and thumbnails to this directory
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
@@ -99,15 +111,26 @@ int main(int argc, char *argv[]) {
         videos = getInfoIn( std::string(argv[1]) );
     }
 
-    if (videos.size() == 0) {
-
-        //const int result = QMessageBox::information( swapped to remove error message
-        QMessageBox::information(
+    if (videos.empty()) {
+        QMessageBox::warning(
             NULL,
-            QString("Tomeo"),
-            QString("no videos found! Add command line argument to \"quoted\" file location."));
+            "Tomeo",
+            "No videos found in the provided directory or directory doesn't exist.\nPlease select a directory with videos.");
+
+        QString selected_dir = getVideoDirectory();
+        if (!selected_dir.isEmpty()) {
+        videos = getInfoIn(selected_dir.toStdString());
+        }
+
+        if (videos.empty()) {
+        QMessageBox::critical(
+            NULL,
+            "Tomeo",
+            "No videos found. The application will now exit.");
         exit(-1);
+        }
     }
+
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
