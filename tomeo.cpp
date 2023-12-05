@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     Settings *settings = new Settings(&window);
     settings->setAttribute(Qt::WA_DeleteOnClose);
-    settings->setFixedSize(400, 1000000);
+    settings->setFixedSize(400, 1040);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
 

@@ -8,6 +8,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        random_time_generator.cpp \
         the_button.cpp \
         the_player.cpp \
         settings.cpp \
@@ -16,6 +17,7 @@ SOURCES += \
         tomeo.cpp
 
 HEADERS += \
+    random_time_generator.h \
     record_video.h \
     the_button.h \
     settings.h \

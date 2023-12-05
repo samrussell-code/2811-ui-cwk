@@ -1,13 +1,18 @@
+// record_video.cpp
+
 #include "record_video.h"
 #include "qcamerainfo.h"
+#include "qdatetime.h"
+#include "qtimer.h"
+#include "random_time_generator.h"
+#include <QDir>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
-#include <QCameraViewfinder>
-#include <QMultimedia>
-#include <QComboBox>
 #include <QPalette>
+#include <QApplication>
+#include <QList>
+#include <QDebug>
 
 RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
 {
@@ -20,7 +25,10 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
     eventInfoLayout = new QVBoxLayout();
     this->setAutoFillBackground(true); // background fill
 
-    schedule_time = new QLabel("00:00:00");
+
+    // create the generator that will set the initial label time.
+    RandomTimeGenerator *gen = new RandomTimeGenerator;
+    schedule_time = new QLabel(gen->scheduleTime());
     schedule_time->setMaximumHeight(20);
     eventInfoLayout->setAlignment(Qt::AlignTop);
     eventInfoLayout->addWidget(schedule_time);
@@ -28,8 +36,19 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
     leftLayout->addLayout(eventInfoLayout);
     leftLayout->addWidget(viewfinder);
 
-    recordButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/record.png"), "");
-    flipButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/flip_dark.png"), "");
+    // create and start a timer to update the schedule time every second
+    timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &RecordVideo::updateScheduleTime);
+    timer->start(1000);
+
+    QString buildPath = QApplication::applicationDirPath();
+    QString recordIconFilename = "record.png";
+    QString flipIconFilename = "flip_dark.png";
+    QString recordIconPath = QDir(buildPath).filePath("icons/" + recordIconFilename);
+    QString flipIconPath = QDir(buildPath).filePath("icons/" + flipIconFilename);
+    qDebug() << recordIconPath;
+    QPushButton *recordButton = new QPushButton(QIcon(recordIconPath), "");
+    QPushButton *flipButton = new QPushButton(QIcon(flipIconPath), "");
 
     cameraComboBox = new QComboBox();
 
@@ -66,11 +85,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent)
 
     setLayout(topLayout);
 
-    //setWindowTitle("tomeo");
-    // THIS ONLY WORKS BECAUSE IT IS THE SAME SIZE AS THE WINDOW ON STARTUP
-    // IF YOU EXPAND THE WINDOW, OR INCREASE THIS SIZE, THE LAYOUT WILL
-    // EXCEED THE BOUNDS OF THE WINDOW
-    setMinimumSize(774,1040);
+    setMinimumSize(774, 1040);
 }
 
 RecordVideo::~RecordVideo()
@@ -87,7 +102,7 @@ void RecordVideo::setupCamera()
     camera->setViewfinder(viewfinder);
 
     QVideoEncoderSettings videoSettings = recorder->videoSettings();
-    videoSettings.setQuality(QMultimedia::VeryHighQuality);
+    videoSettings.setQuality(QMultimedia::NormalQuality);
     videoSettings.setFrameRate(30.0);
 
     recorder->setVideoSettings(videoSettings);
@@ -128,7 +143,8 @@ void RecordVideo::updateViewfinderSettings()
     QList<QSize> availableSettings = camera->supportedViewfinderResolutions();
 
     qDebug() << "Supported Viewfinder Resolutions:";
-    for (const QSize& resolution : availableSettings) {
+    for (const QSize &resolution : availableSettings)
+    {
         qDebug() << "Resolution: " << resolution;
 
         viewfinderSettings.setResolution(resolution);
@@ -152,4 +168,12 @@ void RecordVideo::switchCamera(int index)
     camera->start();
     updateCameraSettings();
     updateViewfinderSettings();
+}
+
+void RecordVideo::updateScheduleTime()
+{
+    QTime time = QTime::fromString(schedule_time->text(), "HH:mm:ss"); // get what is currently on display
+    time = time.addSecs(1);
+    QString updatedTime = time.toString("HH:mm:ss");
+    schedule_time->setText(updatedTime); // add one second to it
 }

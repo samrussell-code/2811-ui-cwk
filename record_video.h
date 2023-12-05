@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include <QWidget>
 
 Q_DECLARE_METATYPE(QCameraInfo)
 
@@ -44,9 +45,19 @@ private:
     bool verticalMode;
     QCameraInfo currentCameraInfo;
 
+    QTimer *timer;  // Added QTimer member variable
+
 private slots:
+    void updateScheduleTime();
     void toggleRecordingMode();
     void switchCamera(int index);
 };
 
 #endif // RECORDVIDEO_H
+
+
+
+
+
+
+
