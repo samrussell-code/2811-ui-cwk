@@ -89,43 +89,58 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    // create the main window and layout
+    // Create the main window and layout
     QWidget window;
     QVBoxLayout *top = new QVBoxLayout();
     window.setLayout(top);
-    window.setWindowTitle("tomeo");
+    window.setWindowTitle("Tomeo");
     window.setMinimumSize(540, 960);
     window.setMaximumSize(540, 960);
 
-    // the widget that will show the video
+    // The widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
     videoWidget->setFixedSize(500, 900);
-
-    // the QMediaPlayer which controls the playback
-    ThePlayer *player = new ThePlayer;
-    player->setVideoOutput(videoWidget);
-
-    // tell the player what videos are available
-    player->setContent(&videos);
-
-    // Add the video widget to the top level widget
     top->addWidget(videoWidget);
 
-    // create the down arrow button
-    QPushButton *downArrowButton = new QPushButton("Next Video");
-    downArrowButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    // The QMediaPlayer which controls the playback
+    ThePlayer *player = new ThePlayer;
+    player->setVideoOutput(videoWidget);
+    player->setContent(&videos);
 
-    // Connect the down arrow button to a slot that changes the video
-    QObject::connect(downArrowButton, &QPushButton::clicked, [player](){
-        player->nextVideo();
-    });
+    // Overlay buttons on the video
+    QPushButton *upArrowButton = new QPushButton(videoWidget);
+    upArrowButton->setIcon(QIcon("/path/to/up_arrow.png"));  // Replace with actual path
+    upArrowButton->setIconSize(QSize(70, 30));
+    upArrowButton->setFlat(true);
+    upArrowButton->setGeometry(0, 10, 500, 50); // Full width
 
-    // Add the down arrow button to the main window layout
-    top->addWidget(downArrowButton);
+    QPushButton *downArrowButton = new QPushButton(videoWidget);
+    downArrowButton->setIcon(QIcon("/path/to/down_arrow.png"));  // Replace with actual path
+    downArrowButton->setIconSize(QSize(70, 30));
+    downArrowButton->setFlat(true);
+    downArrowButton->setGeometry(0, 900 - 50, 500, 50); // Full width
 
-    // showtime!
+    // Connect buttons to their slots
+    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
+    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
+
+    // Settings button
+    QPushButton *settingsButton = new QPushButton(videoWidget);
+    settingsButton->setIcon(QIcon("/path/to/settings_icon.png"));  // Replace with actual path
+    settingsButton->setIconSize(QSize(50, 50));
+    settingsButton->setFlat(true);
+    settingsButton->setGeometry(10, 10, 50, 50);
+
+    // Profile button
+    QPushButton *profileButton = new QPushButton(videoWidget);
+    profileButton->setIcon(QIcon("/path/to/profile_icon.png"));  // Replace with actual path
+    profileButton->setIconSize(QSize(50, 50));
+    profileButton->setFlat(true);
+    profileButton->setGeometry(10, 850, 50, 50);
+
+    // Window setup
     window.show();
 
-    // wait for the app to terminate
+    // Run the application
     return app.exec();
 }
