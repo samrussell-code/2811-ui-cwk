@@ -34,3 +34,11 @@ void ThePlayer::nextVideo() {
         jumpTo(&infos->at(updateCount));
     }
 }
+
+void ThePlayer::previousVideo() {
+    if (infos != nullptr && !infos->empty()) {
+        // Decrease the current video index and wrap around if needed
+        updateCount = (updateCount - 1) % infos->size();
+        jumpTo(&infos->at(updateCount));
+    }
+}
