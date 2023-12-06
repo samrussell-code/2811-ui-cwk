@@ -10,7 +10,7 @@ bool RandomTimeGenerator::seeded = false;
 RandomTimeGenerator::RandomTimeGenerator() : userTimezoneDifference(0) {
     if (!seeded) { // seeding the time gen with the date and year of yesterday
         std::tm previousDate = getPreviousDateGMT();
-        std::srand(previousDate.tm_yday + previousDate.tm_year);
+        std::srand((previousDate.tm_yday + previousDate.tm_year)*746392013); //abritrary multiplier to eliminate pseudorandom patterns
         seeded = true;
     }
 }
@@ -22,7 +22,7 @@ std::tm RandomTimeGenerator::getPreviousDateGMT() {
     previousDateGMT->tm_min = 0;
     previousDateGMT->tm_sec = 0;
 
-    // Subtract one day (24 hours)
+    // subtract one day
     std::time_t previousTime = currentTime - 24 * 60 * 60;
     std::tm* previousDateGMTStruct = std::gmtime(&previousTime);
     previousDateGMTStruct->tm_hour = 0;
@@ -39,13 +39,14 @@ QString RandomTimeGenerator::getCurrentTimeGMT() {
 }
 
 int RandomTimeGenerator::generateRandomTime() {
-    int randomTime = std::rand() % (24 * 60); // now we generate the time for the schedule!
-    randomTime += userTimezoneDifference;
-    randomTime = (randomTime + (24 * 60)) % (24 * 60);
-    return randomTime;
+    savedRandomTime = std::rand() % (24 * 60);
+    savedRandomTime += userTimezoneDifference;
+    savedRandomTime = (savedRandomTime + (24 * 60)) % (24 * 60);
+    return savedRandomTime;
 }
 
-QString RandomTimeGenerator::formatTime(int hours, int minutes) { //formatting for the schedule time label
+
+QString RandomTimeGenerator::formatTime(int hours, int minutes) const {
     return QString("%1:%2:00").arg(hours, 2, 10, QChar('0')).arg(minutes, 2, 10, QChar('0'));
 }
 
@@ -58,4 +59,46 @@ QString RandomTimeGenerator::scheduleTime() { //main function to call when we wa
     qDebug() << "Generated Random Time: " << formattedTime;
 
     return formattedTime;
+}
+
+QString RandomTimeGenerator::getSavedTime() const {
+    int hours = savedRandomTime / 60;
+    int minutes = savedRandomTime % 60;
+    return formatTime(hours, minutes);
+}
+
+QString RandomTimeGenerator::getSavedTimeDifference() const {
+    std::time_t currentTime = std::time(nullptr);
+    std::tm currentTimeStruct;
+    if (std::tm* tempCurrentTimeStruct = std::gmtime(&currentTime)) {
+        currentTimeStruct = *tempCurrentTimeStruct;
+    } else {
+        // Handle the case where std::gmtime returns nullptr (error)
+        // You can add appropriate error handling here
+        // For example, log an error message and set some default values
+        currentTimeStruct = {}; // Set to a default value
+    }
+
+    // Cast savedRandomTime to time_t before passing it to std::localtime
+    std::time_t savedRandomTimeAsTimeT = static_cast<std::time_t>(savedRandomTime);
+    std::tm savedTimeStruct;
+    if (std::tm* tempSavedTimeStruct = std::localtime(&savedRandomTimeAsTimeT)) {
+        savedTimeStruct = *tempSavedTimeStruct;
+    } else {
+        // Handle the case where std::localtime returns nullptr (error)
+        // You can add appropriate error handling here
+        // For example, log an error message and set some default values
+        savedTimeStruct = {}; // Set to a default value
+    }
+
+    // Calculate the time difference in minutes
+    int timeDifference = (currentTimeStruct.tm_hour - savedTimeStruct.tm_hour) * 60 + (currentTimeStruct.tm_min - savedTimeStruct.tm_min);
+
+    // Ensure the difference is positive
+    timeDifference = (timeDifference + (24 * 60)) % (24 * 60);
+
+    int hours = timeDifference / 60;
+    int minutes = timeDifference % 60;
+
+    return formatTime(hours, minutes);
 }

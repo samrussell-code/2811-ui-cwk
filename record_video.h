@@ -35,8 +35,12 @@ private:
     QVBoxLayout *leftLayout;
     QVBoxLayout *rightLayout;
     QVBoxLayout *eventInfoLayout;
-
-    QLabel *schedule_time;
+    QGridLayout *labelsGrid;
+    QLabel *schedule_time_timer;
+    QLabel *schedule_time_daily;
+    QLabel *record_label;
+    QLabel *flipped_label;
+    QLabel *toggled_label;
     QPushButton *recordButton;
     QPushButton *flipButton;
     QPushButton *toggleModeButton;
@@ -50,7 +54,10 @@ private:
 private slots:
     void updateScheduleTime();
     void toggleRecordingMode();
+    void toggleIsRecording();
+    void toggleFlipped();
     void switchCamera(int index);
+    void addLabelToGrid(QLabel *label, int row, int column);
 };
 
 #endif // RECORDVIDEO_H

@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
 
 
     // the widget that will show the video
+
     QVideoWidget *videoWidget = new QVideoWidget;
     videoWidget->setFixedSize(774, 900);
 
@@ -142,16 +143,30 @@ int main(int argc, char *argv[]) {
     // tell the player what videos are available
     player->setContent(&videos);
 
+    QPushButton *upArrowButton = new QPushButton(videoWidget);
+    upArrowButton->setIcon(QIcon("/path/to/up_arrow.png"));
+    upArrowButton->setIconSize(QSize(70, 30));
+    upArrowButton->setFlat(true);
+    //upArrowButton->setGeometry(250, 10, 70, 30);
     // create the down arrow button
     QPushButton *downArrowButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/down_arrow.png"), "");
-    downArrowButton->setIconSize(QSize(75, 25));
-    downArrowButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    downArrowButton->setIcon(QIcon("/path/to/down_arrow.png"));
+    downArrowButton->setIconSize(QSize(70, 30));
+    downArrowButton->setFlat(true);
+    //downArrowButton->setGeometry(250, 860, 70, 30);
 
     // Connect the down arrow button to a slot that changes the video
-    QObject::connect(downArrowButton, &QPushButton::clicked, [player](){
-        player->nextVideo();
-    });
+    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
+    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
 
+    int videoWidgetWidth = 774;
+    int buttonHeight = 50; // Set the button height as needed
+    // Position the up arrow button at the top of the video widget
+    upArrowButton->setGeometry(0, 10, videoWidgetWidth, buttonHeight);
+
+    // Position the down arrow button at the bottom of the video widget
+    // If the video widget is 900px high, the y position would be 900 - buttonHeight
+    downArrowButton->setGeometry(0, 900 - buttonHeight, videoWidgetWidth, buttonHeight);
 
 
     // create the main window and layout
@@ -166,9 +181,18 @@ int main(int argc, char *argv[]) {
 
 
     // Create a button to show the settings page
-    QPushButton *settingsButton = new QPushButton("Settings", &window);
-    settingsButton->setMaximumSize(100, 100);
+    QPushButton *settingsButton = new QPushButton(videoWidget);
+    settingsButton->setIcon(QIcon("/path/to/settings_icon.png")); // Replace with your icon path
+    settingsButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    settingsButton->setFlat(true);
+    settingsButton->setGeometry(10, 10, 50, 50); // Adjust position and size as needed
     top->addWidget(settingsButton);
+
+    QPushButton *profileButton = new QPushButton(videoWidget);
+    profileButton->setIcon(QIcon("/path/to/profile_icon.png")); // Replace with your icon path
+    profileButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    profileButton->setFlat(true);
+    profileButton->setGeometry(10, 850, 50, 50); // Adjust position and size as needed
 
     // Create a button to show the record video page
     QPushButton *recordVideoButton = new QPushButton("Record Video", &window);
@@ -176,10 +200,12 @@ int main(int argc, char *argv[]) {
     top->addWidget(recordVideoButton);
 
     // add the video and the buttons to the top level widget
+    top->addWidget(upArrowButton);
     top->addWidget(videoWidget);
 
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
+
 
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();
