@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QMediaPlayer>
+#include "record_video.h"
 #include "the_button.h"
 #include <vector>
 #include <QTimer>
@@ -20,9 +21,11 @@ private:
     std::vector<TheButtonInfo>* infos;
     std::vector<TheButton*>* buttons;
     QTimer* mTimer;
-    long updateCount = 0;
+    long updateCount = 1; // start at 1 to ignore the users video
+    RecordVideo *recordVideoInstance;
 
 public:
+    ThePlayer(RecordVideo *recordVideo, QObject *parent = nullptr);
     ThePlayer() : QMediaPlayer(NULL) {
         setVolume(0); // be slightly less annoying
         connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
@@ -30,6 +33,7 @@ public:
 
     // all buttons have been setup, store pointers here
     void setContent(std::vector<TheButtonInfo>* i);
+
 
 private slots:
 
@@ -42,6 +46,8 @@ public slots:
     // start playing this ButtonInfo
     void jumpTo (TheButtonInfo* button);
     void nextVideo();
+    void previousVideo();
+    void handleRecordingConfirmedChanged(bool confirmed);
 
 };
 
