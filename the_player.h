@@ -20,7 +20,7 @@ private:
     std::vector<TheButtonInfo>* infos;
     std::vector<TheButton*>* buttons;
     QTimer* mTimer;
-    long updateCount = 0;
+    long updateCount = 1; // start at 1 to ignore the users video
 
 public:
     ThePlayer() : QMediaPlayer(NULL) {

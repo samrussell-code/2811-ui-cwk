@@ -75,7 +75,8 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
                         out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
                     }
                     else{
-                        // store the ico and url in some globals to use later
+                        // the user file is always the 0th in the vector
+                        out . insert(out.begin(), TheButtonInfo( url , ico  ) ); // add to the front of the output list
                     }
                 }
                 else
