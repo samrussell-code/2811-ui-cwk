@@ -91,6 +91,7 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 }
 
 
+
 int main(int argc, char *argv[]) {
 
     // let's just check that Qt is operational first
@@ -253,6 +254,35 @@ int main(int argc, char *argv[]) {
     settings->setFixedSize(400, 1040);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
+
+    QPalette newPalette;
+    newPalette.setColor(QPalette::Background, QColor("#F8FFF4"));
+    window.setStyleSheet("color: black;");
+    qDebug() << "Set theme to light";
+    window.setAutoFillBackground(true);
+    recordVideo->setAutoFillBackground(true);
+    recordVideo->setPalette(newPalette);
+    window.setPalette(newPalette);
+
+    QObject::connect(settings, &Settings::themeChanged, [&window, &recordVideo](const QString& theme) {
+        QPalette newPalette;
+
+        if (theme == "Dark Mode") {
+            newPalette.setColor(QPalette::Background, QColor("#1D1C21"));
+            window.setStyleSheet("color: #9c9c9c;");
+            qDebug() << "Set theme to dark";
+        } else if (theme == "Light Mode") {
+            newPalette.setColor(QPalette::Background, QColor("#F8FFF4"));
+            window.setStyleSheet("color: black;");
+            qDebug() << "Set theme to light";
+        }
+
+        window.setAutoFillBackground(true);
+        recordVideo->setAutoFillBackground(true);
+        recordVideo->setPalette(newPalette);
+        window.setPalette(newPalette);
+    });
+
 
 
     // we should generalise this animation and window setup for less code repetition.

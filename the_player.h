@@ -49,6 +49,7 @@ public slots:
     void previousVideo();
     void handleRecordingConfirmedChanged(bool confirmed);
 
+
 };
 
 #endif //CW2_THE_PLAYER_H

@@ -90,8 +90,8 @@ void Settings::updateUI() {
     // updating theme settings
     themeLabel->setText(themeString);
     themeComboBox->clear();
-    themeComboBox->addItem(darkString);
     themeComboBox->addItem(lightString);
+    themeComboBox->addItem(darkString);
     themeButton->setText(applyString);
 
     // updating exit buttons
@@ -109,16 +109,16 @@ void Settings::changeTheme() {
     QPalette newPalette;
 
     if (themeComboBox->currentText() == darkString) {
-        newPalette.setColor(QPalette::Background, QColor("#001452")); // background colour
+        newPalette.setColor(QPalette::Background, QColor("#1D1C21")); // background colour
         this->setStyleSheet("color: #9c9c9c;"); // text colour
         qDebug() << "set theme to dark";
     }
     if (themeComboBox->currentText() == lightString) {
-        newPalette.setColor(QPalette::Background, QColor("#ffffff")); // background colour
+        newPalette.setColor(QPalette::Background, QColor("#F8FFF4")); // background colour
         this->setStyleSheet("color: black;");
         qDebug() << "set theme to light";
     }
-
+    emit themeChanged(themeComboBox->currentText());
     this->setAutoFillBackground(true);
     this->setPalette(newPalette);
 }
@@ -183,8 +183,8 @@ Settings::Settings(QWidget *parent) : QWidget(parent)
     // theme settings
     themeLabel = new QLabel(themeString, this);
     themeComboBox = new QComboBox(this);
-    themeComboBox->addItem(darkString);
     themeComboBox->addItem(lightString);
+    themeComboBox->addItem(darkString);
     themeComboBox->setStyleSheet("color: black");
     changeTheme();
 

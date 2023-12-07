@@ -49,6 +49,7 @@ private:
 
 
 signals:
+    void themeChanged(const QString& theme);
 
 public slots:
 };
