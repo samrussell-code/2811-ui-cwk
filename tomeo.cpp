@@ -99,6 +99,8 @@ int main(int argc, char *argv[]) {
     // create the Qt Application
     QApplication app(argc, argv);
 
+    QString buildPath = QApplication::applicationDirPath();
+
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
@@ -141,27 +143,25 @@ int main(int argc, char *argv[]) {
     QVideoWidget *videoWidget = new QVideoWidget;
     videoWidget->setFixedSize(774, 900);
 
-    // the QMediaPlayer which controls the playback
-    ThePlayer *player = new ThePlayer;
-    player->setVideoOutput(videoWidget);
-    // tell the player what videos are available
-    player->setContent(&videos);
+
 
     QPushButton *upArrowButton = new QPushButton(videoWidget);
-    upArrowButton->setIcon(QIcon("/path/to/up_arrow.png"));
+    QString upIconFilename = "up_arrow.png";
+    QString upIconPath = QDir(buildPath).filePath("icons/" + upIconFilename);
+    upArrowButton->setIcon(QIcon(upIconPath));
     upArrowButton->setIconSize(QSize(70, 30));
     upArrowButton->setFlat(true);
     //upArrowButton->setGeometry(250, 10, 70, 30);
     // create the down arrow button
-    QPushButton *downArrowButton = new QPushButton(QIcon("C:/Users/russe/OneDrive/Y2/S1/User_Interfaces/2811-ui-cwk/icons/down_arrow.png"), "");
-    downArrowButton->setIcon(QIcon("/path/to/down_arrow.png"));
+    QPushButton *downArrowButton = new QPushButton(videoWidget);
+    QString downIconFilename = "down_arrow.png";
+    QString downIconPath = QDir(buildPath).filePath("icons/" + downIconFilename);
+    downArrowButton->setIcon(QIcon(downIconPath));
     downArrowButton->setIconSize(QSize(70, 30));
     downArrowButton->setFlat(true);
     //downArrowButton->setGeometry(250, 860, 70, 30);
 
-    // Connect the down arrow button to a slot that changes the video
-    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
-    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
+
 
     int videoWidgetWidth = 774;
     int buttonHeight = 50; // Set the button height as needed
@@ -178,33 +178,68 @@ int main(int argc, char *argv[]) {
     QVBoxLayout *top = new QVBoxLayout();
     window.setLayout(top);
     window.setWindowTitle("tomeo");
-    window.setMinimumSize(800, 1040);
+    window.setMinimumSize(800, 1080);
     // https://stackoverflow.com/questions/14943715/qwidget-reports-wrong-width-value/14944640#14944640
     //window.setFixedSize(1280,720);
 
 
-
-    // Create a button to show the settings page
     QPushButton *settingsButton = new QPushButton(videoWidget);
-    settingsButton->setIcon(QIcon("/path/to/settings_icon.png")); // Replace with your icon path
-    settingsButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    QString settingsIconFilename = "settings.png";
+    QString settingsIconPath = QDir(buildPath).filePath("icons/" + settingsIconFilename);
+    settingsButton->setIcon(QIcon(settingsIconPath));
+    settingsButton->setIconSize(QSize(50, 50));
     settingsButton->setFlat(true);
-    settingsButton->setGeometry(10, 10, 50, 50); // Adjust position and size as needed
-    top->addWidget(settingsButton);
+    settingsButton->setGeometry(10, 10, 50, 50);
+
+
 
     QPushButton *profileButton = new QPushButton(videoWidget);
-    profileButton->setIcon(QIcon("/path/to/profile_icon.png")); // Replace with your icon path
-    profileButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    QString profileIconFilename = "profile_icon.png";
+    QString profileIconPath = QDir(buildPath).filePath("icons/" + profileIconFilename);
+    profileButton->setIcon(QIcon(profileIconPath));
+    profileButton->setIconSize(QSize(50, 50));
     profileButton->setFlat(true);
-    profileButton->setGeometry(10, 850, 50, 50); // Adjust position and size as needed
+    profileButton->setGeometry(10, 850, 50, 50);
 
-    // Create a button to show the record video page
-    QPushButton *recordVideoButton = new QPushButton("Record Video", &window);
-    recordVideoButton->setMaximumSize(100, 100);
-    top->addWidget(recordVideoButton);
+
+    QPushButton *recordVideoButton = new QPushButton;
+    QString recordVideoIconFilename = "camera.png";
+    QString recordVideoIconPath = QDir(buildPath).filePath("icons/" + recordVideoIconFilename);
+    recordVideoButton->setIcon(QIcon(recordVideoIconPath));
+    recordVideoButton->setIconSize(QSize(50, 50));
+    recordVideoButton->setFlat(true);
+    recordVideoButton->setGeometry(10, 10, 50, 50);
+
+    QHBoxLayout *navbar;
+    navbar = new QHBoxLayout;
+    navbar->addWidget(settingsButton);
+    navbar->addWidget(recordVideoButton);
+    navbar->addWidget(profileButton);
+
+    navbar->setSpacing(100);
+    navbar->setAlignment(Qt::AlignTop);
+    top->addLayout(navbar);
+
 
     // add the video and the buttons to the top level widget
     top->addWidget(upArrowButton);
+    // create layout for the record video
+    QVBoxLayout *recordVideoLayout = new QVBoxLayout();
+    RecordVideo *recordVideo = new RecordVideo(&window);
+    recordVideo->setAttribute(Qt::WA_DeleteOnClose);
+    recordVideo->hide();
+    recordVideo->setMinimumSize(window.size());
+    recordVideo->setLayout(recordVideoLayout);
+    window.setLayout(recordVideoLayout);
+
+    // the QMediaPlayer which controls the playback
+    ThePlayer *player = new ThePlayer(recordVideo);
+    player->setVideoOutput(videoWidget);
+    // Connect the down arrow button to a slot that changes the video
+    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
+    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
+    // tell the player what videos are available
+    player->setContent(&videos);
     top->addWidget(videoWidget);
 
     // Add the down arrow button to the main window layout
@@ -219,14 +254,6 @@ int main(int argc, char *argv[]) {
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
 
-    // create layout for the record video
-    QVBoxLayout *recordVideoLayout = new QVBoxLayout();
-    RecordVideo *recordVideo = new RecordVideo(&window);
-    recordVideo->setAttribute(Qt::WA_DeleteOnClose);
-    recordVideo->hide();
-    recordVideo->setMinimumSize(window.size());
-    recordVideo->setLayout(recordVideoLayout);
-    window.setLayout(recordVideoLayout);
 
     // we should generalise this animation and window setup for less code repetition.
 
@@ -235,7 +262,7 @@ int main(int argc, char *argv[]) {
         if (!settings->isVisible()) {
             // If settings is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
-            animation->setDuration(500); // Set the duration of the animation in milliseconds
+            animation->setDuration(100); // Set the duration of the animation in milliseconds
             animation->setStartValue(settings->geometry());
             animation->setEndValue(QRect(0, 0, settings->width(), settings->height()));
             animation->start();
@@ -244,7 +271,7 @@ int main(int argc, char *argv[]) {
         } else {
             // If settings is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
-            animation->setDuration(500);
+            animation->setDuration(100);
             animation->setStartValue(settings->geometry());
             animation->setEndValue(QRect(-settings->width(), 0, settings->width(), settings->height()));
             animation->start();
@@ -258,21 +285,21 @@ int main(int argc, char *argv[]) {
     // Connect the record_video button click to the animation
     QObject::connect(recordVideoButton, &QPushButton::clicked, [=]() {
         if (!recordVideo->isVisible()) {
-            // If settings is not visible, show it with animation
+            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
-            animation->setDuration(500); // Set the duration of the animation in milliseconds
-            animation->setStartValue(recordVideo->geometry());
+            animation->setDuration(100);
+            animation->setStartValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->setEndValue(QRect(0, 0, recordVideo->width(), recordVideo->height()));
             animation->start();
             recordVideo->show();
             recordVideo->raise();
-            recordVideoButton->raise(); // currently just raising the button to easily close the layout
+            recordVideoButton->raise();
         } else {
-            // If settings is visible, hide it with animation
+            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
-            animation->setDuration(500);
+            animation->setDuration(100);
             animation->setStartValue(recordVideo->geometry());
-            animation->setEndValue(QRect(-recordVideo->width(), 0, recordVideo->width(), recordVideo->height()));
+            animation->setEndValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->start();
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {

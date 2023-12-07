@@ -4,6 +4,12 @@
 
 #include "the_player.h"
 
+ThePlayer::ThePlayer(RecordVideo *recordVideo, QObject *parent)
+    : QMediaPlayer(parent),
+    recordVideoInstance(recordVideo) {
+    connect(recordVideoInstance, &RecordVideo::recordingConfirmedChanged, this, &ThePlayer::handleRecordingConfirmedChanged);
+}
+
 // all buttons have been setup, store pointers here
 void ThePlayer::setContent(std::vector<TheButtonInfo>* i) {
     infos = i;
@@ -53,5 +59,17 @@ void ThePlayer::previousVideo() {
         }
 
         jumpTo(&infos->at(updateCount));
+    }
+}
+
+void ThePlayer::handleRecordingConfirmedChanged(bool confirmed) {
+    qDebug()<< "reached event in the player" << Qt::endl;
+    // Update your logic to handle the recording confirmation change
+    // For example, stop skipping the first video when recording is confirmed
+    if (confirmed) {
+        // Check if the current video is the 0th one and take appropriate action
+        jumpTo(&infos->at(0));
+        qDebug()<< "Showing the users video" << Qt::endl;
+        // Do something to handle not skipping the first video
     }
 }

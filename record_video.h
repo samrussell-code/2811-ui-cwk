@@ -72,6 +72,9 @@ private slots:
     void confirmVideoUpload();
     void timerTimeout();
     void addLabelToGrid(QLabel *label, int row, int column);
+
+signals:
+    void recordingConfirmedChanged(bool confirmed);
 };
 
 #endif // RECORDVIDEO_H

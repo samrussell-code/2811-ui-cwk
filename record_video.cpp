@@ -32,9 +32,10 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     schedule_time_timer->setMaximumHeight(20);
 
 
-    schedule_time_daily = new QLabel(gen->getSavedTime());
-
-
+    schedule_time_daily = new QLabel("Your daily upload is scheduled for: " + gen->getSavedTime());
+    QString schedule_label_style = "QLabel { color: green; font-weight: bold; background-color: lightgrey}";
+    schedule_time_daily ->setStyleSheet(schedule_label_style);
+    schedule_time_timer ->setStyleSheet(schedule_label_style);
 
     // create and start a timer to update the schedule time every second
     timer = new QTimer(this);
@@ -109,7 +110,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
 
     connect(confirmButton, &QPushButton::clicked, this, &RecordVideo::confirmVideoUpload);
 
-    rightLayout->addWidget(cameraComboBox);
+
 
     // Create a grid layout for labels
     labelsGrid = new QGridLayout();
@@ -118,20 +119,29 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     addLabelToGrid(flipped_label, 1, 0);
     addLabelToGrid(toggled_label, 2, 0);
     labelsGrid->setVerticalSpacing(10);
-    rightLayout->setSpacing(175);
+    rightLayout->setSpacing(350);
     rightLayout->addLayout(labelsGrid);
+
+
+    // put all the major buttons except flip in a QVBox, then flip in its own QVBox. this way right layout will have 3 layouts
+    QVBoxLayout *majorButtonLayout;
+    majorButtonLayout = new QVBoxLayout();
 
     // Create a horizontal layout for the record button and confirm button
     recordConfirmLayout = new QHBoxLayout();
     recordConfirmLayout->addWidget(recordButton);
-    recordConfirmLayout->setSpacing(10);
     recordConfirmLayout->addWidget(confirmButton);
+
 
     QHBoxLayout *flipLayout;
     flipLayout = new QHBoxLayout();
     flipLayout->addWidget(flipButton);
-    rightLayout->addLayout(flipLayout);
-    rightLayout->addLayout(recordConfirmLayout);
+    majorButtonLayout->setSpacing(10);
+    majorButtonLayout->addLayout(flipLayout);
+
+    majorButtonLayout->addLayout(recordConfirmLayout);
+
+    rightLayout->addLayout(majorButtonLayout);
 
     QHBoxLayout *rotateLayout;
     rotateLayout = new QHBoxLayout();
@@ -148,7 +158,9 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     eventInfoLayout->addWidget(schedule_time_daily);
 
     leftLayout->addLayout(eventInfoLayout);
+    leftLayout->addWidget(cameraComboBox,0,Qt::AlignRight);
     leftLayout->addWidget(viewfinder);
+
 
     topLayout->addLayout(leftLayout);
     topLayout->addLayout(rightLayout);
@@ -217,8 +229,8 @@ void RecordVideo::toggleFlipped() {
 void RecordVideo::toggleRecordingMode() {
     // changes a label and flips the recording mode variable
     verticalMode = !verticalMode;
-    updateCameraSettings();
-    updateViewfinderSettings();
+    //updateCameraSettings();
+    //updateViewfinderSettings();
     if(verticalMode == true){
         toggled_label->setText("Vertical Video");
     }
@@ -237,8 +249,13 @@ void RecordVideo::confirmVideoUpload(){
     cameraComboBox->hide();
     schedule_time_daily->hide();
     recordingConfirmed = !recordingConfirmed;
+    if (recordingConfirmed == true){
+        emit recordingConfirmedChanged(true); // send signal out to the_player
+    }
     record_label->setText("Video uploaded!");
     // change the schedule time timer text so that it is tomorrows date.
+    flipped_label->hide();
+    toggled_label->hide();
     schedule_time_timer->setText(gen->getTimeUntilTomorrow());
     confirmationLabel->show();
 }
@@ -324,5 +341,7 @@ void RecordVideo::countdownScheduleTime() {
         cameraComboBox->show();
         schedule_time_daily->show();
         confirmationLabel->show();
+        flipped_label->show();
+        toggled_label->show();
     }
 }
