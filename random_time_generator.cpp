@@ -84,14 +84,18 @@ QString RandomTimeGenerator::getSavedTimeDifference() const {
     std::tm savedTimeStruct;
     if (std::tm* tempSavedTimeStruct = std::localtime(&savedRandomTimeAsTimeT)) {
         savedTimeStruct = *tempSavedTimeStruct;
+        savedTimeStruct.tm_hour = savedTimeStruct.tm_min;
+        savedTimeStruct.tm_min = savedTimeStruct.tm_sec;
     } else {
         // Handle the case where std::localtime returns nullptr (error)
         // You can add appropriate error handling here
         // For example, log an error message and set some default values
         savedTimeStruct = {}; // Set to a default value
+        qDebug() << "defaulting";
     }
 
     // Calculate the time difference in minutes
+    qDebug() << currentTimeStruct.tm_hour << currentTimeStruct.tm_min << ", "<< savedTimeStruct.tm_hour << savedTimeStruct.tm_min << savedTimeStruct.tm_sec;
     int timeDifference = (currentTimeStruct.tm_hour - savedTimeStruct.tm_hour) * 60 + (currentTimeStruct.tm_min - savedTimeStruct.tm_min);
 
     // Ensure the difference is positive
