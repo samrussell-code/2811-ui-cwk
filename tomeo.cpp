@@ -45,7 +45,6 @@ QString getVideoDirectory() {
 std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 
     //loc = "C:\\Users\\russe\\OneDrive\\Y2\\S1\\User_Interfaces\\2811_cw3-master-release-lowresbck\\videos";
-
     std::vector<TheButtonInfo> out =  std::vector<TheButtonInfo>();
     //qDebug() << "dir pass" <<QString::fromStdString(loc);
     QDir dir(QString::fromStdString(loc) );
@@ -57,7 +56,6 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
     while (it.hasNext()) { // for all files
 
         QString f = it.next();
-
         if (f.contains("."))
 
 #if defined(_WIN32)
@@ -73,7 +71,12 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
                 if (!sprite.isNull()) {
                     QIcon* ico = new QIcon(QPixmap::fromImage(sprite)); // voodoo to create an icon for the button
                     QUrl* url = new QUrl(QUrl::fromLocalFile( f )); // convert the file location to a generic url
-                    out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
+                    if(!f.contains("user_video")){ // dont add the user video initially
+                        out . push_back(TheButtonInfo( url , ico  ) ); // add to the output list
+                    }
+                    else{
+                        // store the ico and url in some globals to use later
+                    }
                 }
                 else
                     qDebug() << "warning: skipping video because I couldn't process thumbnail " << thumb << endl;

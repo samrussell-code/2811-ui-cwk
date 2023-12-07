@@ -163,6 +163,7 @@ RecordVideo::~RecordVideo() {
 }
 
 void RecordVideo::addLabelToGrid(QLabel *label, int row, int column) {
+    // remove some redundancy in code by putting this in a method.
     label->setAlignment(Qt::AlignCenter);
     label->setFrameShape(QFrame::Box);
     label->setLineWidth(2);
@@ -187,15 +188,14 @@ void RecordVideo::setupCamera() {
 }
 
 void RecordVideo::toggleIsRecording() {
+    // changes a label, and current icon. The label text is used as the conditional.
     if(record_label->text().contains("Nothing recorded")){
         record_label->setText("Recording");
-        // Set the icon to "recording.png"
         qDebug() <<"Icon in loop: " << recordingIconPath << Qt::endl;
         recordButton->setIcon(QIcon(recordingIconPath));
     }
     else if(record_label->text().contains("Recording")){
         record_label->setText("Recorded");
-        // Set the icon to "cross.png"
         recordButton->setIcon(QIcon(crossIconPath));
         confirmButton->show();
     }
@@ -206,32 +206,25 @@ void RecordVideo::toggleIsRecording() {
     }
 }
 void RecordVideo::toggleFlipped() {
-    // Find the index of the current camera in the list
+    // finds current camera, adds one to the combo box, switches the camera out with that one
+    // called by toggle button on click
     int currentIndex = cameraComboBox->currentIndex();
-
-    // Calculate the index of the next camera, considering the list loop
     int nextIndex = (currentIndex + 1) % cameraComboBox->count();
-
-    // Set the next camera as the current camera
     cameraComboBox->setCurrentIndex(nextIndex);
     switchCamera(nextIndex);
-
-    // Update the flipped_label with the name of the current camera
     flipped_label->setText(cameraComboBox->currentText());
 }
 void RecordVideo::toggleRecordingMode() {
+    // changes a label and flips the recording mode variable
     verticalMode = !verticalMode;
-
     updateCameraSettings();
     updateViewfinderSettings();
-
     if(verticalMode == true){
         toggled_label->setText("Vertical Video");
     }
     else if (verticalMode == false){
         toggled_label->setText("Horizontal Video");
     }
-
     camera->stop();
     camera->start();
 }
@@ -313,15 +306,23 @@ void RecordVideo::countdownScheduleTime() {
     // if there is a recording already uploaded, countdown to the next scheduletime
     QTime time = QTime::fromString(schedule_time_timer->text(), "HH:mm:ss"); // get what is currently on display
     time = time.addSecs(-1);
-    //QString updatedTime ="Next schedule revealed in " + time.toString("HH:mm:ss");
     QString updatedTime =time.toString("HH:mm:ss");
     schedule_time_timer->setText(updatedTime); // add one second to it
     confirmationLabel->show();
     // we need to check if the timer reaches zero and if it does, set videoconfirmed to false (setting the timer to increase)
     // and also generate a new time based off yesterdays date, and set the timer to that instead
+    // we also revert all the changes made in confirmvideo function
     if (time.second() < 0){
         recordingConfirmed = false;
         gen->scheduleTime();
         schedule_time_timer->setText(gen->getSavedTime());
+        recordButton->show();
+        confirmButton->show();
+        flipButton->show();
+        record_label->setText("Nothing recorded");
+        toggleModeButton->show();
+        cameraComboBox->show();
+        schedule_time_daily->show();
+        confirmationLabel->show();
     }
 }

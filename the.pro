@@ -60,6 +60,9 @@ DISTFILES += \
     videos/g.mp4 \
     videos/g.png \
     videos/g.wmv \
+    videos/user_video.wmv \
+    videos/user_video.mp4 \
+    videos/user_video.png \
     icons/record.png \
     icons/flip_light.png \
     icons/flip_dark.png \
