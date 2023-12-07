@@ -23,6 +23,7 @@ SOURCES += \
     settings.cpp \
     record_video.cpp \
     video_test.cpp \
+    friends.cpp \
     tomeo.cpp
 
 HEADERS += \
@@ -31,7 +32,8 @@ HEADERS += \
     the_button.h \
     settings.h \
     video_test.h \
-    the_player.h
+    the_player.h \
+    friends.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

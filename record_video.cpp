@@ -32,7 +32,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     schedule_time_timer->setMaximumHeight(20);
 
 
-    schedule_time_daily = new QLabel("Your daily upload is scheduled for: " + gen->getSavedTime());
+    schedule_time_daily = new QLabel("Your daily upload has been scheduled for: " + gen->getSavedTime());
     QString schedule_label_style = "QLabel { color: green; font-weight: bold; background-color: lightgrey}";
     schedule_time_daily ->setStyleSheet(schedule_label_style);
     schedule_time_timer ->setStyleSheet(schedule_label_style);

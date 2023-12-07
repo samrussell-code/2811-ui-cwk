@@ -216,7 +216,7 @@ Settings::Settings(QWidget *parent) : QWidget(parent)
     auto slideOutAnimation = [=]() {
 
         QPropertyAnimation *animationOut = new QPropertyAnimation(this, "geometry");
-        animationOut->setDuration(500);
+        animationOut->setDuration(100);
         animationOut->setStartValue(geometry());
         animationOut->setEndValue(QRect(-width(), 0, width(), height()));
         animationOut->start();

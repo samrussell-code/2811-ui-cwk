@@ -29,6 +29,7 @@
 #include "the_player.h"
 #include "the_button.h"
 #include "settings.h"
+#include "friends.h"
 
 // get directory from file explorer interface
 QString getVideoDirectory() {
@@ -246,6 +247,13 @@ int main(int argc, char *argv[]) {
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
 
+    //create layout for the settings
+    QVBoxLayout *friendsLayout = new QVBoxLayout();
+    Friends *friends = new Friends(&window);
+    friends->setAttribute(Qt::WA_DeleteOnClose);
+    friends->hide();
+    friends->setMinimumSize(window.size());
+    friends->setLayout(friendsLayout);
 
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();
@@ -259,12 +267,14 @@ int main(int argc, char *argv[]) {
     newPalette.setColor(QPalette::Background, QColor("#F8FFF4"));
     window.setStyleSheet("color: black;");
     qDebug() << "Set theme to light";
-    window.setAutoFillBackground(true);
     recordVideo->setAutoFillBackground(true);
     recordVideo->setPalette(newPalette);
+    friends->setAutoFillBackground(true);
+    friends->setPalette(newPalette);
+    window.setAutoFillBackground(true);
     window.setPalette(newPalette);
 
-    QObject::connect(settings, &Settings::themeChanged, [&window, &recordVideo](const QString& theme) {
+    QObject::connect(settings, &Settings::themeChanged, [&window, &recordVideo, &friends](const QString& theme) {
         QPalette newPalette;
 
         if (theme == "Dark Mode") {
@@ -277,10 +287,12 @@ int main(int argc, char *argv[]) {
             qDebug() << "Set theme to light";
         }
 
-        window.setAutoFillBackground(true);
         recordVideo->setAutoFillBackground(true);
         recordVideo->setPalette(newPalette);
+        friends->setAutoFillBackground(true);
+        friends->setPalette(newPalette);
         window.setPalette(newPalette);
+        window.setAutoFillBackground(true);
     });
 
 
@@ -296,6 +308,8 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(settings->geometry());
             animation->setEndValue(QRect(0, 0, settings->width(), settings->height()));
             animation->start();
+            recordVideo->hide();
+            friends->hide();
             settings->show();
             settings->raise();
         } else {
@@ -321,6 +335,8 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->setEndValue(QRect(0, 0, recordVideo->width(), recordVideo->height()));
             animation->start();
+            settings->hide();
+            friends->hide();
             recordVideo->show();
             recordVideo->raise();
             recordVideoButton->raise();
@@ -334,6 +350,34 @@ int main(int argc, char *argv[]) {
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 recordVideo->hide();
+            });
+        }
+    });
+
+    // Connect the friends button click to the animation
+    QObject::connect(profileButton, &QPushButton::clicked, [=]() {
+        if (!friends->isVisible()) {
+            // If recordVideo is not visible, show it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(QRect(friends->width(), 0, 2*friends->width(), 0));
+            animation->setEndValue(QRect(0, 0, friends->width(), friends->height()));
+            animation->start();
+            settings->hide();
+            recordVideo->hide();
+            friends->show();
+            friends->raise();
+            profileButton->raise();
+        } else {
+            // If recordVideo is visible, hide it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(friends->geometry());
+            animation->setEndValue(QRect(friends->width(), 0, 2*friends->width(), 0));
+            animation->start();
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                friends->hide();
             });
         }
     });
