@@ -45,12 +45,21 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
 
     QString buildPath = QApplication::applicationDirPath();
     QString recordIconFilename = "record.png";
+    QString recordingIconFilename = "recording.png";
     QString flipIconFilename = "flip_dark.png";
-    QString recordIconPath = QDir(buildPath).filePath("icons/" + recordIconFilename);
+    QString crossIconFilename = "cross.png";
+    QString confirmIconFilename = "tick.png";
+    QString toggleModeIconFilename = "rotate.png";
+    QString toggleModeIconPath = QDir(buildPath).filePath("icons/" + toggleModeIconFilename);
+    QString confirmIconPath = QDir(buildPath).filePath("icons/" + confirmIconFilename);
+    recordIconPath = QDir(buildPath).filePath("icons/" + recordIconFilename);
+    recordingIconPath = QDir(buildPath).filePath("icons/" + recordingIconFilename);
+    qDebug() << recordingIconPath << Qt::endl;
+    crossIconPath = QDir(buildPath).filePath("icons/" + crossIconFilename);
     QString flipIconPath = QDir(buildPath).filePath("icons/" + flipIconFilename);
     qDebug() << recordIconPath;
-    QPushButton *recordButton = new QPushButton(QIcon(recordIconPath), "");
-    QPushButton *flipButton = new QPushButton(QIcon(flipIconPath), "");
+    recordButton = new QPushButton(QIcon(recordIconPath), "");
+    flipButton = new QPushButton(QIcon(flipIconPath), "");
 
     cameraComboBox = new QComboBox();
 
@@ -62,7 +71,6 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
 
     //setup some labels for buttons:
     record_label = new QLabel("Nothing recorded");
-    flipped_label = new QLabel("Front Camera");
     toggled_label = new QLabel("Horizontal Video");
 
     connect(cameraComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -74,31 +82,60 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     recordButton->setMinimumSize(75, 75);
     recordButton->setMaximumSize(75, 75);
 
+    confirmButton = new QPushButton(QIcon(confirmIconPath), "");
+    confirmButton->setStyleSheet(buttonStyle); // Style sheet
+    confirmButton->setIconSize(QSize(75, 75));
+    confirmButton->setMinimumSize(75, 75);
+    confirmButton->setMaximumSize(75, 75);
+    confirmButton->hide();  // Initially hide the confirm button
+
     flipButton->setStyleSheet(buttonStyle); // Style sheet
     flipButton->setIconSize(QSize(75, 75));
     flipButton->setMinimumSize(75, 75);
     flipButton->setMaximumSize(75, 75);
 
-    QPushButton *toggleModeButton = new QPushButton("Toggle Mode");
+    toggleModeButton = new QPushButton(QIcon(toggleModeIconPath), "");
+    toggleModeButton->setStyleSheet(buttonStyle); // Style sheet
+    toggleModeButton->setIconSize(QSize(75, 75));
+    toggleModeButton->setMinimumSize(75, 75);
+    toggleModeButton->setMaximumSize(75, 75);
     connect(toggleModeButton, &QPushButton::clicked, this, &RecordVideo::toggleRecordingMode);
 
     connect(recordButton, &QPushButton::clicked, this, &RecordVideo::toggleIsRecording);
 
     connect(flipButton, &QPushButton::clicked, this, &RecordVideo::toggleFlipped);
 
+    connect(confirmButton, &QPushButton::clicked, this, &RecordVideo::confirmVideoUpload);
+
     rightLayout->addWidget(cameraComboBox);
 
     // Create a grid layout for labels
     labelsGrid = new QGridLayout();
-    rightLayout->addLayout(labelsGrid);
-
+    flipped_label = new QLabel(cameraComboBox->currentText());
     addLabelToGrid(record_label, 0, 0);
     addLabelToGrid(flipped_label, 1, 0);
     addLabelToGrid(toggled_label, 2, 0);
+    labelsGrid->setVerticalSpacing(10);
+    rightLayout->setSpacing(175);
+    rightLayout->addLayout(labelsGrid);
 
-    rightLayout->addWidget(flipButton);
-    rightLayout->addWidget(recordButton);
-    rightLayout->addWidget(toggleModeButton);
+
+    // Create a horizontal layout for the record button and confirm button
+    recordConfirmLayout = new QHBoxLayout();
+    recordConfirmLayout->addWidget(recordButton);
+    recordConfirmLayout->setSpacing(10);
+    recordConfirmLayout->addWidget(confirmButton);
+
+    QHBoxLayout *flipLayout;
+    flipLayout = new QHBoxLayout();
+    flipLayout->addWidget(flipButton);
+    rightLayout->addLayout(flipLayout);
+    rightLayout->addLayout(recordConfirmLayout);
+
+    QHBoxLayout *rotateLayout;
+    rotateLayout = new QHBoxLayout();
+    rotateLayout->addWidget(toggleModeButton);
+    rightLayout->addLayout(rotateLayout);
 
     topLayout->addLayout(leftLayout);
     topLayout->addLayout(rightLayout);
@@ -117,7 +154,6 @@ void RecordVideo::addLabelToGrid(QLabel *label, int row, int column) {
     label->setFrameShape(QFrame::Box);
     label->setLineWidth(2);
     label->setStyleSheet("QLabel { background-color: darkgrey; }");
-
     labelsGrid->addWidget(label, row, column);
 }
 
@@ -140,23 +176,36 @@ void RecordVideo::setupCamera() {
 void RecordVideo::toggleIsRecording() {
     if(record_label->text().contains("Nothing recorded")){
         record_label->setText("Recording");
+        // Set the icon to "recording.png"
+        qDebug() <<"Icon in loop: " << recordingIconPath << Qt::endl;
+        recordButton->setIcon(QIcon(recordingIconPath));
     }
-    else{
+    else if(record_label->text().contains("Recording")){
         record_label->setText("Recorded");
-    }
-}
-
-void RecordVideo::toggleFlipped() {
-    if(flipped_label->text().contains("Front Camera")){
-        flipped_label->setText("Back Camera");
+        // Set the icon to "cross.png"
+        recordButton->setIcon(QIcon(crossIconPath));
+        confirmButton->show();
     }
     else{
-        flipped_label->setText("Front Camera");
+        record_label->setText("Nothing recorded");
+        recordButton->setIcon(QIcon(recordIconPath));
+        confirmButton->hide();
     }
-    camera->stop();
-    camera->start();
 }
+void RecordVideo::toggleFlipped() {
+    // Find the index of the current camera in the list
+    int currentIndex = cameraComboBox->currentIndex();
 
+    // Calculate the index of the next camera, considering the list loop
+    int nextIndex = (currentIndex + 1) % cameraComboBox->count();
+
+    // Set the next camera as the current camera
+    cameraComboBox->setCurrentIndex(nextIndex);
+    switchCamera(nextIndex);
+
+    // Update the flipped_label with the name of the current camera
+    flipped_label->setText(cameraComboBox->currentText());
+}
 void RecordVideo::toggleRecordingMode() {
     verticalMode = !verticalMode;
 
@@ -172,6 +221,16 @@ void RecordVideo::toggleRecordingMode() {
 
     camera->stop();
     camera->start();
+}
+
+void RecordVideo::confirmVideoUpload(){
+    recordButton->hide();
+    confirmButton->hide();
+    flipButton->hide();
+    toggleModeButton->hide();
+    cameraComboBox->hide();
+
+    record_label->setText("Video uploaded!");
 }
 
 void RecordVideo::updateCameraSettings() {

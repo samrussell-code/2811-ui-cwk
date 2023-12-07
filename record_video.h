@@ -29,6 +29,11 @@ private:
     void updateCameraSettings();
     void updateViewfinderSettings();
 
+    QPushButton *confirmButton;
+    QHBoxLayout *recordConfirmLayout;
+    QString recordIconPath;
+    QString recordingIconPath;
+    QString crossIconPath;
     QCamera *camera;
     QCameraViewfinder *viewfinder;
     QMediaRecorder *recorder;
@@ -57,6 +62,7 @@ private slots:
     void toggleIsRecording();
     void toggleFlipped();
     void switchCamera(int index);
+    void confirmVideoUpload();
     void addLabelToGrid(QLabel *label, int row, int column);
 };
 
