@@ -25,22 +25,20 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     this->setAutoFillBackground(true); // background fill
 
     // create the generator that will set the initial label time.
-    RandomTimeGenerator *gen = new RandomTimeGenerator;
+    gen = new RandomTimeGenerator;
+    recordingConfirmed = false; //init this as false
     gen->scheduleTime();
     schedule_time_timer = new QLabel(gen->getSavedTimeDifference());
     schedule_time_timer->setMaximumHeight(20);
-    eventInfoLayout->setAlignment(Qt::AlignTop);
-    eventInfoLayout->addWidget(schedule_time_timer);
+
 
     schedule_time_daily = new QLabel(gen->getSavedTime());
-    eventInfoLayout->addWidget(schedule_time_daily);
 
-    leftLayout->addLayout(eventInfoLayout);
-    leftLayout->addWidget(viewfinder);
+
 
     // create and start a timer to update the schedule time every second
     timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &RecordVideo::updateScheduleTime);
+    connect(timer, &QTimer::timeout, this, &RecordVideo::timerTimeout);
     timer->start(1000);
 
     QString buildPath = QApplication::applicationDirPath();
@@ -87,7 +85,11 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     confirmButton->setIconSize(QSize(75, 75));
     confirmButton->setMinimumSize(75, 75);
     confirmButton->setMaximumSize(75, 75);
-    confirmButton->hide();  // Initially hide the confirm button
+    confirmButton->hide();
+
+    confirmationLabel = new QLabel("Next schedule revealed in: ");
+    confirmationLabel->setStyleSheet("QLabel { color: green; font-weight: bold; }");
+    confirmationLabel->hide();
 
     flipButton->setStyleSheet(buttonStyle); // Style sheet
     flipButton->setIconSize(QSize(75, 75));
@@ -119,7 +121,6 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     rightLayout->setSpacing(175);
     rightLayout->addLayout(labelsGrid);
 
-
     // Create a horizontal layout for the record button and confirm button
     recordConfirmLayout = new QHBoxLayout();
     recordConfirmLayout->addWidget(recordButton);
@@ -137,6 +138,18 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     rotateLayout->addWidget(toggleModeButton);
     rightLayout->addLayout(rotateLayout);
 
+    scheduleLayout = new QHBoxLayout();
+    scheduleLayout->setSpacing(10);
+    scheduleLayout->addWidget(confirmationLabel);
+    scheduleLayout->addWidget(schedule_time_timer);
+
+    eventInfoLayout->setAlignment(Qt::AlignLeft);
+    eventInfoLayout->addLayout(scheduleLayout);
+    eventInfoLayout->addWidget(schedule_time_daily);
+
+    leftLayout->addLayout(eventInfoLayout);
+    leftLayout->addWidget(viewfinder);
+
     topLayout->addLayout(leftLayout);
     topLayout->addLayout(rightLayout);
 
@@ -153,7 +166,7 @@ void RecordVideo::addLabelToGrid(QLabel *label, int row, int column) {
     label->setAlignment(Qt::AlignCenter);
     label->setFrameShape(QFrame::Box);
     label->setLineWidth(2);
-    label->setStyleSheet("QLabel { background-color: darkgrey; }");
+    label->setStyleSheet("QLabel { background-color: lightgrey; color: green; font-weight: bold; }");
     labelsGrid->addWidget(label, row, column);
 }
 
@@ -229,8 +242,12 @@ void RecordVideo::confirmVideoUpload(){
     flipButton->hide();
     toggleModeButton->hide();
     cameraComboBox->hide();
-
+    schedule_time_daily->hide();
+    recordingConfirmed = !recordingConfirmed;
     record_label->setText("Video uploaded!");
+    // change the schedule time timer text so that it is tomorrows date.
+    schedule_time_timer->setText(gen->getTimeUntilTomorrow());
+    confirmationLabel->show();
 }
 
 void RecordVideo::updateCameraSettings() {
@@ -276,9 +293,35 @@ void RecordVideo::switchCamera(int index) {
     updateViewfinderSettings();
 }
 
+void RecordVideo::timerTimeout() {
+    if (recordingConfirmed == true) {
+        countdownScheduleTime();
+    } else {
+        updateScheduleTime();
+    }
+}
+
 void RecordVideo::updateScheduleTime() {
     QTime time = QTime::fromString(schedule_time_timer->text(), "HH:mm:ss"); // get what is currently on display
     time = time.addSecs(1);
     QString updatedTime = time.toString("HH:mm:ss");
     schedule_time_timer->setText(updatedTime); // add one second to it
+    confirmationLabel->hide();
+}
+
+void RecordVideo::countdownScheduleTime() {
+    // if there is a recording already uploaded, countdown to the next scheduletime
+    QTime time = QTime::fromString(schedule_time_timer->text(), "HH:mm:ss"); // get what is currently on display
+    time = time.addSecs(-1);
+    //QString updatedTime ="Next schedule revealed in " + time.toString("HH:mm:ss");
+    QString updatedTime =time.toString("HH:mm:ss");
+    schedule_time_timer->setText(updatedTime); // add one second to it
+    confirmationLabel->show();
+    // we need to check if the timer reaches zero and if it does, set videoconfirmed to false (setting the timer to increase)
+    // and also generate a new time based off yesterdays date, and set the timer to that instead
+    if (time.second() < 0){
+        recordingConfirmed = false;
+        gen->scheduleTime();
+        schedule_time_timer->setText(gen->getSavedTime());
+    }
 }

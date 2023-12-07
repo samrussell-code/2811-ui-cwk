@@ -12,12 +12,16 @@ public:
     QString scheduleTime();
     QString getCurrentTimeGMT();
     QString getSavedTime() const; // New method to get the saved time
+    QString formatTime(int hours, int minutes) const; // Corrected declaration
     QString getSavedTimeDifference() const;
+    QString getTimeUntilTomorrow() const;
+    std::tm getNextDateGMT() const;
 
 private:
     int generateRandomTime();
-    QString formatTime(int hours, int minutes) const; // Corrected declaration
+
     std::tm getPreviousDateGMT();
+
     int userTimezoneDifference;
 
     // Seed the random number generator during initialization

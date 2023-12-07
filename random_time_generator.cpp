@@ -32,6 +32,23 @@ std::tm RandomTimeGenerator::getPreviousDateGMT() {
     return *previousDateGMTStruct;
 }
 
+std::tm RandomTimeGenerator::getNextDateGMT() const{
+    std::time_t currentTime = std::time(nullptr);
+    std::tm* previousDateGMT = std::gmtime(&currentTime);
+    previousDateGMT->tm_hour = 0; // remove the time variables so it remains static all day
+    previousDateGMT->tm_min = 0;
+    previousDateGMT->tm_sec = 0;
+
+    // subtract one day
+    std::time_t previousTime = currentTime + 24 * 60 * 60;
+    std::tm* previousDateGMTStruct = std::gmtime(&previousTime);
+    previousDateGMTStruct->tm_hour = 0;
+    previousDateGMTStruct->tm_min = 0;
+    previousDateGMTStruct->tm_sec = 0;
+
+    return *previousDateGMTStruct;
+}
+
 QString RandomTimeGenerator::getCurrentTimeGMT() {
     std::time_t currentTime = std::time(nullptr);
     std::tm* currentTimeGMT = std::gmtime(&currentTime);
@@ -97,6 +114,34 @@ QString RandomTimeGenerator::getSavedTimeDifference() const {
     // Calculate the time difference in minutes
     qDebug() << currentTimeStruct.tm_hour << currentTimeStruct.tm_min << ", "<< savedTimeStruct.tm_hour << savedTimeStruct.tm_min << savedTimeStruct.tm_sec;
     int timeDifference = (currentTimeStruct.tm_hour - savedTimeStruct.tm_hour) * 60 + (currentTimeStruct.tm_min - savedTimeStruct.tm_min);
+
+    // Ensure the difference is positive
+    timeDifference = (timeDifference + (24 * 60)) % (24 * 60);
+
+    int hours = timeDifference / 60;
+    int minutes = timeDifference % 60;
+
+    return formatTime(hours, minutes);
+}
+
+QString RandomTimeGenerator::getTimeUntilTomorrow() const {
+    std::time_t currentTime = std::time(nullptr);
+    std::tm currentTimeStruct;
+    if (std::tm* tempCurrentTimeStruct = std::gmtime(&currentTime)) {
+        currentTimeStruct = *tempCurrentTimeStruct;
+    } else {
+        // Handle the case where std::gmtime returns nullptr (error)
+        // You can add appropriate error handling here
+        // For example, log an error message and set some default values
+        currentTimeStruct = {}; // Set to a default value
+    }
+
+    // Cast savedRandomTime to time_t before passing it to std::localtime
+    std::tm timeTomorrow = this->getNextDateGMT();
+
+    // Calculate the time difference in minutes
+    qDebug() << currentTimeStruct.tm_hour << currentTimeStruct.tm_min << ", "<< timeTomorrow.tm_hour << timeTomorrow.tm_min << timeTomorrow.tm_sec;
+    int timeDifference = ( timeTomorrow.tm_hour - currentTimeStruct.tm_hour) * 60 + ( timeTomorrow.tm_min - currentTimeStruct.tm_min);
 
     // Ensure the difference is positive
     timeDifference = (timeDifference + (24 * 60)) % (24 * 60);
