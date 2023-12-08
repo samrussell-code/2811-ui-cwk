@@ -126,14 +126,28 @@ int main(int argc, char *argv[]) {
 
     // Settings button
     QPushButton *settingsButton = new QPushButton(videoWidget);
-    settingsButton->setIcon(QIcon("/path/to/settings_icon.png"));  // Replace with actual path
+    settingsButton->setIcon(QIcon("/Users/emersonsmac/OneDrive - University of Adelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/settings.png"));
     settingsButton->setIconSize(QSize(50, 50));
     settingsButton->setFlat(true);
     settingsButton->setGeometry(10, 10, 50, 50);
 
+    // Camera button
+    QPushButton *cameraButton = new QPushButton(videoWidget);
+    cameraButton->setIcon(QIcon("/Users/emersonsmac/OneDrive - University of Adelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/settings.png"));  // Replace with actual path
+    cameraButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    cameraButton->setFlat(true);
+    cameraButton->setGeometry((500 - 50) / 2, 10, 50, 50); // Centered at the top of videoWidget
+
+    // Settings button (Add Friends icon)
+    QPushButton *friendsButton = new QPushButton(videoWidget);
+    friendsButton->setIcon(QIcon("/Users/emersonsmac/OneDrive - University of Adelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/settings.png"));
+    friendsButton->setIconSize(QSize(50, 50)); // Adjust size as needed
+    friendsButton->setFlat(true);
+    friendsButton->setGeometry(10, 10, 50, 50); // Top left corner
+
     // Profile button
     QPushButton *profileButton = new QPushButton(videoWidget);
-    profileButton->setIcon(QIcon("/path/to/profile_icon.png"));  // Replace with actual path
+    profileButton->setIcon(QIcon("/Users/emersonsmac/OneDrive - University of Adelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/settings.png"));
     profileButton->setIconSize(QSize(50, 50));
     profileButton->setFlat(true);
     profileButton->setGeometry(10, 850, 50, 50);

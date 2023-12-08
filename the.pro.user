@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.3, 2023-12-06T16:39:09. -->
+<!-- Written by QtCreator 11.0.3, 2023-12-06T16:40:33. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -240,11 +240,12 @@
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/the.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/the.pro</value>
-    <value type="QString" key="RunConfiguration.Arguments">/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds\ stuff/Classes/UI/2811-ui-cwk/videos</value>
+    <value type="QString" key="RunConfiguration.Arguments">/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds\ stuff/Classes/UI/2811-ui-cwk/videos
+</value>
+    <value type="bool" key="RunConfiguration.Arguments.multi">true</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory">/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds stuff/Classes/UI/2811-ui-cwk/videos</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/emersonsmac/Library/CloudStorage/OneDrive-UniversityofAdelaide/2023/Leeds stuff/Classes/UI/build-the-Desktop_Qt_5_15_16_for_macOS_Universal-Debug/the.app/Contents/MacOS</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
