@@ -11,7 +11,10 @@ icon.path = $$OUT_PWD
 icon.files += icons/record.png \
               icons/flip_light.png \
               icons/flip_dark.png \
-              icons/down_arrow.png
+              icons/down_arrow.png \
+              icons/up_arrow.png \
+              icons/settings.png \
+              icons/profile.png
 
 # Add icon files to the build
 INSTALLS += icon

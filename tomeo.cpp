@@ -93,16 +93,23 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 
 
 
-int main(int argc, char *argv[]) {
 
+int main(int argc, char *argv[]) {
     // let's just check that Qt is operational first
     qDebug() << "Qt version: " << QT_VERSION_STR << endl;
 
     // create the Qt Application
     QApplication app(argc, argv);
 
-    QString buildPath = QApplication::applicationDirPath();
+    QString buildPath = QCoreApplication::applicationDirPath();
 
+    // Check if the platform is macOS
+    qDebug() << QSysInfo::productType();
+    if (QSysInfo::productType() == "osx") {
+        // If macOS, remove the contents part of the build path
+        buildPath = buildPath.left(buildPath.lastIndexOf("/the.app"));
+    }
+    qDebug() << buildPath;
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
@@ -141,15 +148,13 @@ int main(int argc, char *argv[]) {
 
 
     // the widget that will show the video
-
     QVideoWidget *videoWidget = new QVideoWidget;
     videoWidget->setFixedSize(774, 900);
-
-
 
     QPushButton *upArrowButton = new QPushButton(videoWidget);
     QString upIconFilename = "up_arrow.png";
     QString upIconPath = QDir(buildPath).filePath("icons/" + upIconFilename);
+    qDebug() << upIconPath << Qt::endl;
     upArrowButton->setIcon(QIcon(upIconPath));
     upArrowButton->setIconSize(QSize(70, 30));
     upArrowButton->setFlat(true);
@@ -162,7 +167,6 @@ int main(int argc, char *argv[]) {
     downArrowButton->setIconSize(QSize(70, 30));
     downArrowButton->setFlat(true);
     //downArrowButton->setGeometry(250, 860, 70, 30);
-
 
 
     int videoWidgetWidth = 774;
@@ -192,7 +196,6 @@ int main(int argc, char *argv[]) {
     settingsButton->setIconSize(QSize(50, 50));
     settingsButton->setFlat(true);
     settingsButton->setGeometry(10, 10, 50, 50);
-
 
 
     QPushButton *profileButton = new QPushButton(videoWidget);
@@ -360,7 +363,7 @@ int main(int argc, char *argv[]) {
             // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
-            animation->setStartValue(QRect(friends->width(), 0, 2*friends->width(), 0));
+            animation->setStartValue(QRect(0, -friends->height(), friends->width(), friends->height()));
             animation->setEndValue(QRect(0, 0, friends->width(), friends->height()));
             animation->start();
             settings->hide();
@@ -373,7 +376,7 @@ int main(int argc, char *argv[]) {
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
             animation->setStartValue(friends->geometry());
-            animation->setEndValue(QRect(friends->width(), 0, 2*friends->width(), 0));
+            animation->setEndValue(QRect(0, -friends->height(), friends->width(), friends->height()));
             animation->start();
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
