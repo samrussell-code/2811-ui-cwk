@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.3, 2023-12-11T13:14:46. -->
+<!-- Written by QtCreator 11.0.3, 2023-12-11T13:29:45. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -238,13 +238,13 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/the.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/the.pro</value>
-    <value type="QString" key="RunConfiguration.Arguments">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/videos</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">the2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/the.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/the.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/videos</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/build-the-Desktop_Qt_5_15_16_for_macOS_Universal-Debug</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/build-the-Desktop_Qt_5_15_16_for_macOS_Universal-Debug/the.app/Contents/MacOS</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
