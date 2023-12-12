@@ -341,6 +341,7 @@ int main(int argc, char *argv[]) {
             settings->hide();
             friends->hide();
             recordVideo->show();
+            recordVideoButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             recordVideo->raise();
             recordVideoButton->raise();
         } else {
@@ -350,6 +351,7 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(recordVideo->geometry());
             animation->setEndValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->start();
+            recordVideoButton->setIcon(QIcon(recordVideoIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 recordVideo->hide();
@@ -370,6 +372,7 @@ int main(int argc, char *argv[]) {
             recordVideo->hide();
             friends->show();
             friends->raise();
+            profileButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             profileButton->raise();
         } else {
             // If recordVideo is visible, hide it with animation
@@ -378,6 +381,7 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(friends->geometry());
             animation->setEndValue(QRect(0, -friends->height(), friends->width(), friends->height()));
             animation->start();
+            profileButton->setIcon(QIcon(profileIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 friends->hide();
