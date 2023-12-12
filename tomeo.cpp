@@ -29,6 +29,7 @@
 #include "the_player.h"
 #include "the_button.h"
 #include "settings.h"
+#include "friends.h"
 
 // get directory from file explorer interface
 QString getVideoDirectory() {
@@ -91,16 +92,24 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
 }
 
 
-int main(int argc, char *argv[]) {
 
+
+int main(int argc, char *argv[]) {
     // let's just check that Qt is operational first
     qDebug() << "Qt version: " << QT_VERSION_STR << endl;
 
     // create the Qt Application
     QApplication app(argc, argv);
 
-    QString buildPath = QApplication::applicationDirPath();
+    QString buildPath = QCoreApplication::applicationDirPath();
 
+    // Check if the platform is macOS
+    qDebug() << QSysInfo::productType();
+    if (QSysInfo::productType() == "osx") {
+        // If macOS, remove the contents part of the build path
+        buildPath = buildPath.left(buildPath.lastIndexOf("/the.app"));
+    }
+    qDebug() << buildPath;
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
@@ -139,15 +148,13 @@ int main(int argc, char *argv[]) {
 
 
     // the widget that will show the video
-
     QVideoWidget *videoWidget = new QVideoWidget;
     videoWidget->setFixedSize(774, 900);
-
-
 
     QPushButton *upArrowButton = new QPushButton(videoWidget);
     QString upIconFilename = "up_arrow.png";
     QString upIconPath = QDir(buildPath).filePath("icons/" + upIconFilename);
+    qDebug() << upIconPath << Qt::endl;
     upArrowButton->setIcon(QIcon(upIconPath));
     upArrowButton->setIconSize(QSize(70, 30));
     upArrowButton->setFlat(true);
@@ -160,7 +167,6 @@ int main(int argc, char *argv[]) {
     downArrowButton->setIconSize(QSize(70, 30));
     downArrowButton->setFlat(true);
     //downArrowButton->setGeometry(250, 860, 70, 30);
-
 
 
     int videoWidgetWidth = 774;
@@ -190,7 +196,6 @@ int main(int argc, char *argv[]) {
     settingsButton->setIconSize(QSize(50, 50));
     settingsButton->setFlat(true);
     settingsButton->setGeometry(10, 10, 50, 50);
-
 
 
     QPushButton *profileButton = new QPushButton(videoWidget);
@@ -245,6 +250,13 @@ int main(int argc, char *argv[]) {
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
 
+    //create layout for the settings
+    QVBoxLayout *friendsLayout = new QVBoxLayout();
+    Friends *friends = new Friends(&window);
+    friends->setAttribute(Qt::WA_DeleteOnClose);
+    friends->hide();
+    friends->setMinimumSize(window.size());
+    friends->setLayout(friendsLayout);
 
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();
@@ -253,6 +265,39 @@ int main(int argc, char *argv[]) {
     settings->setFixedSize(400, 1040);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
+
+    QPalette newPalette;
+    newPalette.setColor(QPalette::Background, QColor("#F8FFF4"));
+    window.setStyleSheet("color: black;");
+    qDebug() << "Set theme to light";
+    recordVideo->setAutoFillBackground(true);
+    recordVideo->setPalette(newPalette);
+    friends->setAutoFillBackground(true);
+    friends->setPalette(newPalette);
+    window.setAutoFillBackground(true);
+    window.setPalette(newPalette);
+
+    QObject::connect(settings, &Settings::themeChanged, [&window, &recordVideo, &friends](const QString& theme) {
+        QPalette newPalette;
+
+        if (theme == "Dark Mode") {
+            newPalette.setColor(QPalette::Background, QColor("#1D1C21"));
+            window.setStyleSheet("color: #9c9c9c;");
+            qDebug() << "Set theme to dark";
+        } else if (theme == "Light Mode") {
+            newPalette.setColor(QPalette::Background, QColor("#F8FFF4"));
+            window.setStyleSheet("color: black;");
+            qDebug() << "Set theme to light";
+        }
+
+        recordVideo->setAutoFillBackground(true);
+        recordVideo->setPalette(newPalette);
+        friends->setAutoFillBackground(true);
+        friends->setPalette(newPalette);
+        window.setPalette(newPalette);
+        window.setAutoFillBackground(true);
+    });
+
 
 
     // we should generalise this animation and window setup for less code repetition.
@@ -266,6 +311,8 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(settings->geometry());
             animation->setEndValue(QRect(0, 0, settings->width(), settings->height()));
             animation->start();
+            recordVideo->hide();
+            friends->hide();
             settings->show();
             settings->raise();
         } else {
@@ -291,6 +338,8 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->setEndValue(QRect(0, 0, recordVideo->width(), recordVideo->height()));
             animation->start();
+            settings->hide();
+            friends->hide();
             recordVideo->show();
             recordVideo->raise();
             recordVideoButton->raise();
@@ -304,6 +353,34 @@ int main(int argc, char *argv[]) {
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 recordVideo->hide();
+            });
+        }
+    });
+
+    // Connect the friends button click to the animation
+    QObject::connect(profileButton, &QPushButton::clicked, [=]() {
+        if (!friends->isVisible()) {
+            // If recordVideo is not visible, show it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(QRect(0, -friends->height(), friends->width(), friends->height()));
+            animation->setEndValue(QRect(0, 0, friends->width(), friends->height()));
+            animation->start();
+            settings->hide();
+            recordVideo->hide();
+            friends->show();
+            friends->raise();
+            profileButton->raise();
+        } else {
+            // If recordVideo is visible, hide it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(friends->geometry());
+            animation->setEndValue(QRect(0, -friends->height(), friends->width(), friends->height()));
+            animation->start();
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                friends->hide();
             });
         }
     });

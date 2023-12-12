@@ -11,7 +11,10 @@ icon.path = $$OUT_PWD
 icon.files += icons/record.png \
               icons/flip_light.png \
               icons/flip_dark.png \
-              icons/down_arrow.png
+              icons/down_arrow.png \
+              icons/up_arrow.png \
+              icons/settings.png \
+              icons/profile.png
 
 # Add icon files to the build
 INSTALLS += icon
@@ -23,6 +26,7 @@ SOURCES += \
     settings.cpp \
     record_video.cpp \
     video_test.cpp \
+    friends.cpp \
     tomeo.cpp
 
 HEADERS += \
@@ -31,7 +35,8 @@ HEADERS += \
     the_button.h \
     settings.h \
     video_test.h \
-    the_player.h
+    the_player.h \
+    friends.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

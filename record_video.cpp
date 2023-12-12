@@ -34,15 +34,24 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
 
     schedule_time_daily = new QLabel("Your daily upload is scheduled for: " + gen->getSavedTime());
     QString schedule_label_style = "QLabel { color: green; font-weight: bold; background-color: lightgrey}";
+    QString schedule_label_style_red = "QLabel { color: darkred; font-weight: bold; background-color: lightgrey}";
     schedule_time_daily ->setStyleSheet(schedule_label_style);
-    schedule_time_timer ->setStyleSheet(schedule_label_style);
+    schedule_time_timer ->setStyleSheet(schedule_label_style_red);
 
     // create and start a timer to update the schedule time every second
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &RecordVideo::timerTimeout);
     timer->start(1000);
 
-    QString buildPath = QApplication::applicationDirPath();
+    QString buildPath = QCoreApplication::applicationDirPath();
+
+    // Check if the platform is macOS
+    qDebug() << QSysInfo::productType();
+    if (QSysInfo::productType() == "osx") {
+        // If macOS, remove the contents part of the build path
+        buildPath = buildPath.left(buildPath.lastIndexOf("/the.app"));
+    }
+    qDebug() << buildPath;
     QString recordIconFilename = "record.png";
     QString recordingIconFilename = "recording.png";
     QString flipIconFilename = "flip_dark.png";
@@ -345,3 +354,5 @@ void RecordVideo::countdownScheduleTime() {
         toggled_label->show();
     }
 }
+
+

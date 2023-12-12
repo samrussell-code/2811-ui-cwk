@@ -8,6 +8,8 @@ ThePlayer::ThePlayer(RecordVideo *recordVideo, QObject *parent)
     : QMediaPlayer(parent),
     recordVideoInstance(recordVideo) {
     connect(recordVideoInstance, &RecordVideo::recordingConfirmedChanged, this, &ThePlayer::handleRecordingConfirmedChanged);
+    setVolume(0); // be slightly less annoying
+    connect (this, SIGNAL (stateChanged(QMediaPlayer::State)), this, SLOT (playStateChanged(QMediaPlayer::State)) );
 }
 
 // all buttons have been setup, store pointers here
