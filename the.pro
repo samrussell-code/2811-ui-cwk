@@ -21,6 +21,7 @@ icon.files += icons/record.png \
 INSTALLS += icon
 
 SOURCES += \
+    faqlayout.cpp \
     random_time_generator.cpp \
     the_button.cpp \
     the_player.cpp \
@@ -31,6 +32,7 @@ SOURCES += \
     tomeo.cpp
 
 HEADERS += \
+    faqlayout.h \
     random_time_generator.h \
     record_video.h \
     the_button.h \

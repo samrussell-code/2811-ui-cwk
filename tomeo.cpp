@@ -30,6 +30,7 @@
 #include "the_button.h"
 #include "settings.h"
 #include "friends.h"
+#include "faqlayout.h"
 
 // get directory from file explorer interface
 QString getVideoDirectory() {
@@ -149,7 +150,7 @@ int main(int argc, char *argv[]) {
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
-    videoWidget->setFixedSize(774, 900);
+    videoWidget->setFixedSize(774, 700);
 
     QPushButton *upArrowButton = new QPushButton(videoWidget);
     QString upIconFilename = "up_arrow.png";
@@ -169,14 +170,14 @@ int main(int argc, char *argv[]) {
     //downArrowButton->setGeometry(250, 860, 70, 30);
 
 
-    int videoWidgetWidth = 774;
-    int buttonHeight = 50; // Set the button height as needed
+    int videoWidgetWidth = 750;
+    int buttonHeight = 70; // Set the button height as needed
     // Position the up arrow button at the top of the video widget
     upArrowButton->setGeometry(0, 10, videoWidgetWidth, buttonHeight);
 
     // Position the down arrow button at the bottom of the video widget
     // If the video widget is 900px high, the y position would be 900 - buttonHeight
-    downArrowButton->setGeometry(0, 900 - buttonHeight, videoWidgetWidth, buttonHeight);
+    downArrowButton->setGeometry(0, 1080 - buttonHeight, videoWidgetWidth, buttonHeight);
 
 
     // create the main window and layout
@@ -215,6 +216,21 @@ int main(int argc, char *argv[]) {
     recordVideoButton->setFlat(true);
     recordVideoButton->setGeometry(10, 10, 50, 50);
 
+    QPushButton *faqButton = new QPushButton;
+    QString faqIconFilename = "faq.png";
+    QString faqIconPath = QDir(buildPath).filePath("icons/" + faqIconFilename);
+    faqButton->setIcon(QIcon(faqIconPath));
+    faqButton->setIconSize(QSize(45, 45)); // smaller icon size
+    faqButton->setFlat(true);
+
+    QLabel *faqTextLabel = new QLabel("F.A.Q");
+    faqTextLabel->setStyleSheet("color: black; font-size: 12px;");
+
+    QHBoxLayout *faqButtonLayout = new QHBoxLayout;
+    faqButtonLayout->addWidget(faqTextLabel);
+    faqButtonLayout->addWidget(faqButton);
+    faqButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
     QHBoxLayout *navbar;
     navbar = new QHBoxLayout;
     navbar->addWidget(settingsButton);
@@ -237,6 +253,8 @@ int main(int argc, char *argv[]) {
     recordVideo->setLayout(recordVideoLayout);
     window.setLayout(recordVideoLayout);
 
+
+
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer(recordVideo);
     player->setVideoOutput(videoWidget);
@@ -249,6 +267,7 @@ int main(int argc, char *argv[]) {
 
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
+    top->addLayout(faqButtonLayout);
 
     //create layout for the settings
     QVBoxLayout *friendsLayout = new QVBoxLayout();
@@ -258,11 +277,18 @@ int main(int argc, char *argv[]) {
     friends->setMinimumSize(window.size());
     friends->setLayout(friendsLayout);
 
+    QVBoxLayout *faqLayout = new QVBoxLayout();
+    FaqLayout *faq = new FaqLayout(&window);
+    faq->setAttribute(Qt::WA_DeleteOnClose);
+    faq->hide();
+    faq->setMinimumSize(window.size());
+    faq->setLayout(faqLayout);
+
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     Settings *settings = new Settings(&window);
     settings->setAttribute(Qt::WA_DeleteOnClose);
-    settings->setFixedSize(400, 1040);
+    settings->setFixedSize(400, 1080);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
 
@@ -385,6 +411,35 @@ int main(int argc, char *argv[]) {
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 friends->hide();
+            });
+        }
+    });
+
+    QObject::connect(faqButton, &QPushButton::clicked, [=]() {
+        if (!faq->isVisible()) {
+            // If recordVideo is not visible, show it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(QRect(0, -faq->height(), faq->width(), faq->height()));
+            animation->setEndValue(QRect(0, 0, faq->width(), faq->height()));
+            animation->start();
+            settings->hide();
+            faq->hide();
+            faq->show();
+            faq->raise();
+            faqButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
+            faqButton->raise();
+        } else {
+            // If recordVideo is visible, hide it with animation
+            QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(friends->geometry());
+            animation->setEndValue(QRect(0, -faq->height(), faq->width(), faq->height()));
+            animation->start();
+            faqButton->setIcon(QIcon(faqIconPath));
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                faq->hide();
             });
         }
     });
