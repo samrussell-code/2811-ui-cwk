@@ -1,4 +1,4 @@
-//
+ //
 //    ______
 //   /_  __/___  ____ ___  ___  ____
 //    / / / __ \/ __ `__ \/ _ \/ __ \
@@ -357,8 +357,8 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    // Connect the friends button click to the animation
-    QObject::connect(profileButton, &QPushButton::clicked, [=]() {
+
+    auto profileAnimation = [=]() {
         if (!friends->isVisible()) {
             // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
@@ -383,7 +383,13 @@ int main(int argc, char *argv[]) {
                 friends->hide();
             });
         }
-    });
+    };
+
+    // Connect the friends button click to the animation
+    QObject::connect(profileButton, &QPushButton::clicked, profileAnimation);
+    QObject::connect(settings, &Settings::openProfile, profileAnimation);
+
+
 
     // showtime!
     window.show();

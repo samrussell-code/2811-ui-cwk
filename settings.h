@@ -17,7 +17,8 @@ public:
     void changeLanguage(const QString& newLanguage);
     void updateUI();
     void changeTheme();
-
+    void changeTextScaling();
+    void changeFontSize(int newSize);
 
 private:
     QPalette palette;
@@ -32,17 +33,24 @@ private:
     QString themeString;
     QString lightString;
     QString darkString;
+    QString textScalingString;
+    QString smallString;
+    QString mediumString;
+    QString largeString;
     QString saveString;
     QString cancelString;
 
     QLabel *userLabel;
     QLabel *languageLabel;
     QLabel *themeLabel;
+    QLabel *textScalingLabel;
     QComboBox *languageComboBox;
     QComboBox *themeComboBox;
+    QComboBox *textScalingComboBox;
     QPushButton *editProfileButton;
     QPushButton *logOutButton;
     QPushButton *languageButton;
+    QPushButton *textScalingButton;
     QPushButton *themeButton;
     QPushButton *saveButton;
     QPushButton *cancelButton;
@@ -50,6 +58,7 @@ private:
 
 signals:
     void themeChanged(const QString& theme);
+    void openProfile();
 
 public slots:
 };

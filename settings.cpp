@@ -31,6 +31,10 @@ void Settings::changeLanguage(const QString& newLanguage) {
         themeString = "Theme";
         lightString = "Light Mode";
         darkString = "Dark Mode";
+        textScalingString = "Text Scaling";
+        smallString = "Small";
+        mediumString = "Medium";
+        largeString = "Large";
         saveString = "Save";
         cancelString = "Cancel";
     }
@@ -38,10 +42,14 @@ void Settings::changeLanguage(const QString& newLanguage) {
         currentLoginString = "Actualmente conectado como:";
         editString = "Editar Perfil";
         logoutString = "Cerrar Sesión";
-            languageString = "Configuración de Idioma";
-            themeString = "Tema";
+        languageString = "Configuración de Idioma";
+        themeString = "Tema";
         lightString = "Modo Claro";
         darkString = "Modo Oscuro";
+        textScalingString = "Ajuste de Texto";
+        smallString = "Pequeño";
+        mediumString = "Mediano";
+        largeString = "Grande";
         applyString = "Aplicar";
         saveString = "Guardar";
         cancelString = "Cancelar";
@@ -54,6 +62,10 @@ void Settings::changeLanguage(const QString& newLanguage) {
         themeString = "主题";
         lightString = "亮色模式";
         darkString = "暗色模式";
+        textScalingString = "文本缩放";
+        smallString = "小";
+        mediumString = "中";
+        largeString = "大";
         applyString = "应用";
         saveString = "保存";
         cancelString = "取消";
@@ -122,6 +134,38 @@ void Settings::changeTheme() {
     this->setAutoFillBackground(true);
     this->setPalette(newPalette);
 }
+
+void Settings::changeTextScaling() {
+
+    int newSize = 6;  // Set a default size or retrieve it from your settings
+
+    if (textScalingComboBox->currentText() == smallString) {
+        newSize = 8;
+    } else if (textScalingComboBox->currentText() == mediumString) {
+        newSize = 12;
+    } else if (textScalingComboBox->currentText() == largeString) {
+        newSize = 16;
+    }
+
+    changeFontSize(newSize);
+}
+
+void Settings::changeFontSize(int newSize) {
+
+    // Iterate through all child widgets
+    for (auto *child : this->findChildren<QWidget*>()) {
+        // Check if the child widget has a font
+        if (auto *fontHolder = qobject_cast<QWidget*>(child)) {
+            // Get the current font of the child widget
+            QFont font = fontHolder->font();
+            // Set the new font size
+            font.setPointSize(newSize);
+            // Apply the new font to the child widget
+            fontHolder->setFont(font);
+        }
+    }
+}
+
 
 Settings::Settings(QWidget *parent) : QWidget(parent)
 {
@@ -198,6 +242,26 @@ Settings::Settings(QWidget *parent) : QWidget(parent)
 
     addHorizontalDivider(mainLayout);
 
+    // font size settings
+    textScalingLabel = new QLabel(textScalingString, this);
+    textScalingComboBox = new QComboBox(this);
+    textScalingComboBox->addItem(smallString);
+    textScalingComboBox->addItem(mediumString);
+    textScalingComboBox->addItem(largeString);
+    textScalingComboBox->setStyleSheet("color: black");
+    changeTextScaling();
+
+    textScalingButton = new QPushButton(applyString, this);
+    textScalingButton->setMinimumSize(60, 25);
+    textScalingButton->setStyleSheet("color: black;");
+
+    mainLayout->addWidget(textScalingLabel);
+    mainLayout->addWidget(textScalingComboBox);
+    mainLayout->addWidget(textScalingButton);
+
+
+    addHorizontalDivider(mainLayout);
+
     // create horizontal box for exit buttons
     QHBoxLayout *exitBox = new QHBoxLayout();
     saveButton = new QPushButton(saveString, this);
@@ -239,6 +303,16 @@ Settings::Settings(QWidget *parent) : QWidget(parent)
     // connect button to change theme
     QObject::connect(themeButton, &QPushButton::clicked, this, [=](){
         changeTheme();
+    });
+
+    QObject::connect(textScalingButton, &QPushButton::clicked, this, [=](){
+        changeTextScaling();
+    });
+
+    // connect buttons to close the settings then open the profile
+    QObject::connect(editProfileButton, &QPushButton::clicked, slideOutAnimation);
+    QObject::connect(editProfileButton, &QPushButton::clicked, [=]() {
+        emit openProfile();
     });
 
     hide();
