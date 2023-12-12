@@ -43,6 +43,18 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     connect(timer, &QTimer::timeout, this, &RecordVideo::timerTimeout);
     timer->start(1000);
 
+    // Initialize the record timer
+    recordTimer = new QTimer(this);
+    recordTimerLabel = new QLabel("00:00:00");
+    recordTimerLabel->setStyleSheet("QLabel { color: darkred; font-weight: bold; }");
+    recordTimerLabel->setAlignment(Qt::AlignCenter);
+    recordTimerLabel->hide();
+
+    // Create a layout for the record timer
+    QHBoxLayout *timerLayout = new QHBoxLayout();
+    timerLayout->addWidget(recordTimerLabel);
+
+
     QString buildPath = QCoreApplication::applicationDirPath();
 
     // Check if the platform is macOS
@@ -119,6 +131,8 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
 
     connect(confirmButton, &QPushButton::clicked, this, &RecordVideo::confirmVideoUpload);
 
+    connect(recordTimer, &QTimer::timeout, this, &RecordVideo::updateRecordTimerLabel);
+
 
 
     // Create a grid layout for labels
@@ -146,6 +160,7 @@ RecordVideo::RecordVideo(QWidget *parent) : QWidget(parent) {
     flipLayout = new QHBoxLayout();
     flipLayout->addWidget(flipButton);
     majorButtonLayout->setSpacing(10);
+    majorButtonLayout->addLayout(timerLayout);
     majorButtonLayout->addLayout(flipLayout);
 
     majorButtonLayout->addLayout(recordConfirmLayout);
@@ -183,6 +198,12 @@ RecordVideo::~RecordVideo() {
     camera->stop();
 }
 
+void RecordVideo::updateRecordTimerLabel() {
+    elapsedRecordTime = elapsedRecordTime.addSecs(1);
+    QString formattedTime = elapsedRecordTime.toString("HH:mm:ss");
+    recordTimerLabel->setText(formattedTime);
+}
+
 void RecordVideo::addLabelToGrid(QLabel *label, int row, int column) {
     // remove some redundancy in code by putting this in a method.
     label->setAlignment(Qt::AlignCenter);
@@ -211,18 +232,24 @@ void RecordVideo::setupCamera() {
 void RecordVideo::toggleIsRecording() {
     // changes a label, and current icon. The label text is used as the conditional.
     if(record_label->text().contains("Nothing recorded")){
+        elapsedRecordTime = QTime(0, 0); //  start recording
+        recordTimer->start(1000);
+        recordTimerLabel->show();
         record_label->setText("Recording");
         qDebug() <<"Icon in loop: " << recordingIconPath << Qt::endl;
         recordButton->setIcon(QIcon(recordingIconPath));
     }
     else if(record_label->text().contains("Recording")){
+        recordTimer->stop();
         record_label->setText("Recorded");
         recordButton->setIcon(QIcon(crossIconPath));
         confirmButton->show();
     }
     else{
         record_label->setText("Nothing recorded");
+        recordTimerLabel->setText("00:00:00");
         recordButton->setIcon(QIcon(recordIconPath));
+        recordTimerLabel->hide();
         confirmButton->hide();
     }
 }
@@ -264,6 +291,7 @@ void RecordVideo::confirmVideoUpload(){
     record_label->setText("Video uploaded!");
     // change the schedule time timer text so that it is tomorrows date.
     flipped_label->hide();
+    recordTimerLabel->hide();
     toggled_label->hide();
     schedule_time_timer->setText(gen->getTimeUntilTomorrow());
     confirmationLabel->show();

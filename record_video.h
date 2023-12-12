@@ -2,6 +2,7 @@
 #define RECORDVIDEO_H
 
 #include "qcamerainfo.h"
+#include "qdatetime.h"
 #include "random_time_generator.h"
 #include <QMainWindow>
 #include <QWidget>
@@ -54,6 +55,9 @@ private:
     QPushButton *flipButton;
     QPushButton *toggleModeButton;
     QComboBox *cameraComboBox;
+    QTimer *recordTimer;
+    QLabel *recordTimerLabel;
+    QTime elapsedRecordTime;
 
     bool verticalMode;
     bool recordingConfirmed;
@@ -71,6 +75,7 @@ private slots:
     void switchCamera(int index);
     void confirmVideoUpload();
     void timerTimeout();
+    void updateRecordTimerLabel();
     void addLabelToGrid(QLabel *label, int row, int column);
 
 signals:
