@@ -327,11 +327,8 @@ int main(int argc, char *argv[]) {
 
 
     // we should generalise this animation and window setup for less code repetition.
-
-    // Connect the button click to the animation
     QObject::connect(settingsButton, &QPushButton::clicked, [=]() {
         if (!settings->isVisible()) {
-            // If settings is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
             animation->setDuration(100); // Set the duration of the animation in milliseconds
             animation->setStartValue(settings->geometry());
@@ -342,7 +339,6 @@ int main(int argc, char *argv[]) {
             settings->show();
             settings->raise();
         } else {
-            // If settings is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
             animation->setDuration(100);
             animation->setStartValue(settings->geometry());
@@ -355,10 +351,9 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    // Connect the record_video button click to the animation
+    // connect the record_video button click to the animation
     QObject::connect(recordVideoButton, &QPushButton::clicked, [=]() {
         if (!recordVideo->isVisible()) {
-            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
             animation->setDuration(100);
             animation->setStartValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
@@ -371,7 +366,6 @@ int main(int argc, char *argv[]) {
             recordVideo->raise();
             recordVideoButton->raise();
         } else {
-            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
             animation->setDuration(100);
             animation->setStartValue(recordVideo->geometry());
@@ -388,7 +382,6 @@ int main(int argc, char *argv[]) {
     // Connect the friends button click to the animation
     QObject::connect(profileButton, &QPushButton::clicked, [=]() {
         if (!friends->isVisible()) {
-            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
             animation->setStartValue(QRect(0, -friends->height(), friends->width(), friends->height()));
@@ -401,7 +394,6 @@ int main(int argc, char *argv[]) {
             profileButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             profileButton->raise();
         } else {
-            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
             animation->setStartValue(friends->geometry());
@@ -417,25 +409,30 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(faqButton, &QPushButton::clicked, [=]() {
         if (!faq->isVisible()) {
-            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
             animation->setDuration(100);
             animation->setStartValue(QRect(0, -faq->height(), faq->width(), faq->height()));
             animation->setEndValue(QRect(0, 0, faq->width(), faq->height()));
             animation->start();
             settings->hide();
-            faq->hide();
+            recordVideo->hide();
+            friends->hide();
+            settingsButton->hide();
+            recordVideoButton->hide();
+            profileButton->hide();
             faq->show();
             faq->raise();
             faqButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             faqButton->raise();
         } else {
-            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
             animation->setDuration(100);
             animation->setStartValue(friends->geometry());
             animation->setEndValue(QRect(0, -faq->height(), faq->width(), faq->height()));
             animation->start();
+            settingsButton->show();
+            recordVideoButton->show();
+            profileButton->show();
             faqButton->setIcon(QIcon(faqIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {

@@ -1,17 +1,18 @@
+// faqlayout.h
 #ifndef FAQLAYOUT_H
 #define FAQLAYOUT_H
 
-#include "qboxlayout.h"
 #include <QWidget>
+#include <QtWidgets>
 
 class FaqLayout : public QWidget {
     Q_OBJECT
 
 public:
-    FaqLayout(QWidget *parent = nullptr);
+    explicit FaqLayout(QWidget *parent = nullptr);
 
 private:
-    void addFaqEntry(QVBoxLayout *layout, const QString &question, const QString &answer);
+    void addFaqEntry(QVBoxLayout *layout, const QString &question, const QString &answer, const QString &iconPath);
 };
 
 #endif // FAQLAYOUT_H
