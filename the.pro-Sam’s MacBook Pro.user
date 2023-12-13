@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.3, 2023-12-11T13:29:45. -->
+<!-- Written by QtCreator 11.0.3, 2023-11-29T11:12:35. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -81,6 +81,9 @@
     <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
     <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
     <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
+   </valuemap>
+   <valuemap type="QVariantMap" key="CppEditor.QuickFix">
+    <value type="bool" key="UseGlobalSettings">true</value>
    </valuemap>
   </valuemap>
  </data>
@@ -238,10 +241,9 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">the2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/the.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/the.pro</value>
-    <value type="QString" key="RunConfiguration.Arguments">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/2811-ui-cwk/videos</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/the.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/the.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/2811-ui-cwk/videos</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
@@ -409,6 +411,7 @@
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/Users/samrussell/Library/CloudStorage/OneDrive-Personal/Y2/S1/User_Interfaces/build-the-Desktop_Qt_5_13_2_clang_64bit-Debug/the.app/Contents/MacOS</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>
