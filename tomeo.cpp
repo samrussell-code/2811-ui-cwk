@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         videos = getInfoIn( std::string(argv[1]) );
     }
 
-    likeStates.resize(videos.size(), false); // create unliked for all videos
+
 
     if (videos.empty()) {
         QMessageBox::warning(
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
         }
     }
-
+    likeStates.resize(videos.size(), false); // create unliked for all videos
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
