@@ -441,8 +441,11 @@ int main(int argc, char *argv[]) {
             animation->start();
             settings->hide();
             recordVideo->hide();
+            settingsButton->hide();
+            recordVideoButton->hide();
             friends->show();
             friends->raise();
+            likeButton->hide();
             profileButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             profileButton->raise();
         } else {
@@ -451,6 +454,9 @@ int main(int argc, char *argv[]) {
             animation->setStartValue(friends->geometry());
             animation->setEndValue(QRect(0, -friends->height(), friends->width(), friends->height()));
             animation->start();
+            settingsButton->show();
+            likeButton->show();
+            recordVideoButton->show();
             profileButton->setIcon(QIcon(profileIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {

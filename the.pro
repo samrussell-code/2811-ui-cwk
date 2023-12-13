@@ -24,21 +24,25 @@ INSTALLS += icon
 
 SOURCES += \
     faqlayout.cpp \
+    profile.cpp \
     random_time_generator.cpp \
     the_button.cpp \
     the_player.cpp \
     settings.cpp \
     record_video.cpp \
+    user.cpp \
     video_test.cpp \
     friends.cpp \
     tomeo.cpp
 
 HEADERS += \
     faqlayout.h \
+    profile.h \
     random_time_generator.h \
     record_video.h \
     the_button.h \
     settings.h \
+    user.h \
     video_test.h \
     the_player.h \
     friends.h
