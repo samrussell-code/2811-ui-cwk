@@ -30,6 +30,7 @@
 #include "the_button.h"
 #include "settings.h"
 #include "friends.h"
+#include "faqlayout.h"
 
 // get directory from file explorer interface
 QString getVideoDirectory() {
@@ -91,9 +92,7 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
     return out;
 }
 
-
-
-
+std::vector<bool> likeStates;
 int main(int argc, char *argv[]) {
     // let's just check that Qt is operational first
     qDebug() << "Qt version: " << QT_VERSION_STR << endl;
@@ -113,6 +112,7 @@ int main(int argc, char *argv[]) {
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
+
     // Print out the argument passed to the application
     if (argc > 1) {
         qDebug() << "Argument passed to the application: " << argv[1] << endl;
@@ -125,6 +125,8 @@ int main(int argc, char *argv[]) {
         std::cout << std::string(argv[1]) ;
         videos = getInfoIn( std::string(argv[1]) );
     }
+
+    likeStates.resize(videos.size(), false); // create unliked for all videos
 
     if (videos.empty()) {
         QMessageBox::warning(
@@ -149,7 +151,7 @@ int main(int argc, char *argv[]) {
 
     // the widget that will show the video
     QVideoWidget *videoWidget = new QVideoWidget;
-    videoWidget->setFixedSize(774, 900);
+    videoWidget->setFixedSize(774, 700);
 
     QPushButton *upArrowButton = new QPushButton(videoWidget);
     QString upIconFilename = "up_arrow.png";
@@ -169,14 +171,14 @@ int main(int argc, char *argv[]) {
     //downArrowButton->setGeometry(250, 860, 70, 30);
 
 
-    int videoWidgetWidth = 774;
-    int buttonHeight = 50; // Set the button height as needed
+    int videoWidgetWidth = 750;
+    int buttonHeight = 70; // Set the button height as needed
     // Position the up arrow button at the top of the video widget
     upArrowButton->setGeometry(0, 10, videoWidgetWidth, buttonHeight);
 
     // Position the down arrow button at the bottom of the video widget
     // If the video widget is 900px high, the y position would be 900 - buttonHeight
-    downArrowButton->setGeometry(0, 900 - buttonHeight, videoWidgetWidth, buttonHeight);
+    downArrowButton->setGeometry(0, 1080 - buttonHeight, videoWidgetWidth, buttonHeight);
 
 
     // create the main window and layout
@@ -215,6 +217,21 @@ int main(int argc, char *argv[]) {
     recordVideoButton->setFlat(true);
     recordVideoButton->setGeometry(10, 10, 50, 50);
 
+    QPushButton *faqButton = new QPushButton;
+    QString faqIconFilename = "faq.png";
+    QString faqIconPath = QDir(buildPath).filePath("icons/" + faqIconFilename);
+    faqButton->setIcon(QIcon(faqIconPath));
+    faqButton->setIconSize(QSize(45, 45)); // smaller icon size
+    faqButton->setFlat(true);
+
+    QLabel *faqTextLabel = new QLabel("F.A.Q");
+    faqTextLabel->setStyleSheet("color: black; font-size: 12px;");
+
+    QHBoxLayout *faqButtonLayout = new QHBoxLayout;
+    faqButtonLayout->addWidget(faqTextLabel);
+    faqButtonLayout->addWidget(faqButton);
+    faqButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
     QHBoxLayout *navbar;
     navbar = new QHBoxLayout;
     navbar->addWidget(settingsButton);
@@ -237,18 +254,38 @@ int main(int argc, char *argv[]) {
     recordVideo->setLayout(recordVideoLayout);
     window.setLayout(recordVideoLayout);
 
+
+
     // the QMediaPlayer which controls the playback
     ThePlayer *player = new ThePlayer(recordVideo);
     player->setVideoOutput(videoWidget);
     // Connect the down arrow button to a slot that changes the video
-    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
-    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
+
     // tell the player what videos are available
     player->setContent(&videos);
-    top->addWidget(videoWidget);
+
+    QPushButton *likeButton = new QPushButton(videoWidget);
+    QString likedIconFilename = "liked.png";
+    QString unlikedIconFilename = "unliked.png";
+    QString likedIconPath = QDir(buildPath).filePath("icons/" + likedIconFilename);
+    QString unlikedIconPath = QDir(buildPath).filePath("icons/" + unlikedIconFilename);
+    QIcon likedIcon = QIcon(likedIconPath);
+    QIcon unlikedIcon = QIcon(unlikedIconPath);
+    likeButton->setIcon(unlikedIcon);
+    likeButton->setIconSize(QSize(50, 50));
+    likeButton->setFlat(true);
+    likeButton->setGeometry(videoWidget->width() - 50, videoWidget->height() + 10, 50, 50);
+    QVBoxLayout *videoLayout = new QVBoxLayout;
+    videoLayout->addWidget(videoWidget);
+
+    // Add the like button to the video layout
+    videoLayout->addWidget(likeButton, 0, Qt::AlignBottom | Qt::AlignRight);
+
+    top->addLayout(videoLayout);
 
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
+    top->addLayout(faqButtonLayout);
 
     //create layout for the settings
     QVBoxLayout *friendsLayout = new QVBoxLayout();
@@ -258,11 +295,18 @@ int main(int argc, char *argv[]) {
     friends->setMinimumSize(window.size());
     friends->setLayout(friendsLayout);
 
+    QVBoxLayout *faqLayout = new QVBoxLayout();
+    FaqLayout *faq = new FaqLayout(&window);
+    faq->setAttribute(Qt::WA_DeleteOnClose);
+    faq->hide();
+    faq->setMinimumSize(window.size());
+    faq->setLayout(faqLayout);
+
     // create layout for the settings
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     Settings *settings = new Settings(&window);
     settings->setAttribute(Qt::WA_DeleteOnClose);
-    settings->setFixedSize(400, 1040);
+    settings->setFixedSize(400, 1080);
     settings->setLayout(settingsLayout);
     window.setLayout(settingsLayout);
 
@@ -300,12 +344,43 @@ int main(int argc, char *argv[]) {
 
 
 
-    // we should generalise this animation and window setup for less code repetition.
 
-    // Connect the button click to the animation
+    QObject::connect(upArrowButton, &QPushButton::clicked, [=, &player]() {
+
+        player->previousVideo();
+        int videoIndex = player->getCurrentIndex();
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        likeButton->setIcon(likeIcon);
+
+    });
+    QObject::connect(downArrowButton, &QPushButton::clicked, [=, &player]() {
+        player->nextVideo();
+        int videoIndex = player->getCurrentIndex();
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        likeButton->setIcon(likeIcon);
+    });
+
+    auto toggleLikeState = [=](int videoIndex) {
+        likeStates[videoIndex] = !likeStates[videoIndex];
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+
+        likeButton->setIcon(likeIcon);
+    };
+
+    // Connect like button's click signal
+    QObject::connect(likeButton, &QPushButton::clicked, [=](){
+        int currentVideoIndex = player->getCurrentIndex();
+        toggleLikeState(currentVideoIndex);
+    });
+
+
+
+    // we should generalise this animation and window setup for less code repetition.
     QObject::connect(settingsButton, &QPushButton::clicked, [=]() {
         if (!settings->isVisible()) {
-            // If settings is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
             animation->setDuration(100); // Set the duration of the animation in milliseconds
             animation->setStartValue(settings->geometry());
@@ -316,7 +391,6 @@ int main(int argc, char *argv[]) {
             settings->show();
             settings->raise();
         } else {
-            // If settings is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(settings, "geometry");
             animation->setDuration(100);
             animation->setStartValue(settings->geometry());
@@ -329,10 +403,9 @@ int main(int argc, char *argv[]) {
         }
     });
 
-    // Connect the record_video button click to the animation
+    // connect the record_video button click to the animation
     QObject::connect(recordVideoButton, &QPushButton::clicked, [=]() {
         if (!recordVideo->isVisible()) {
-            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
             animation->setDuration(100);
             animation->setStartValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
@@ -341,15 +414,16 @@ int main(int argc, char *argv[]) {
             settings->hide();
             friends->hide();
             recordVideo->show();
+            recordVideoButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             recordVideo->raise();
             recordVideoButton->raise();
         } else {
-            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(recordVideo, "geometry");
             animation->setDuration(100);
             animation->setStartValue(recordVideo->geometry());
             animation->setEndValue(QRect(0, -recordVideo->height(), recordVideo->width(), recordVideo->height()));
             animation->start();
+            recordVideoButton->setIcon(QIcon(recordVideoIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 recordVideo->hide();
@@ -360,7 +434,6 @@ int main(int argc, char *argv[]) {
     // Connect the friends button click to the animation
     QObject::connect(profileButton, &QPushButton::clicked, [=]() {
         if (!friends->isVisible()) {
-            // If recordVideo is not visible, show it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
             animation->setStartValue(QRect(0, -friends->height(), friends->width(), friends->height()));
@@ -370,17 +443,52 @@ int main(int argc, char *argv[]) {
             recordVideo->hide();
             friends->show();
             friends->raise();
+            profileButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
             profileButton->raise();
         } else {
-            // If recordVideo is visible, hide it with animation
             QPropertyAnimation *animation = new QPropertyAnimation(friends, "geometry");
             animation->setDuration(100);
             animation->setStartValue(friends->geometry());
             animation->setEndValue(QRect(0, -friends->height(), friends->width(), friends->height()));
             animation->start();
+            profileButton->setIcon(QIcon(profileIconPath));
 
             QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
                 friends->hide();
+            });
+        }
+    });
+
+    QObject::connect(faqButton, &QPushButton::clicked, [=]() {
+        if (!faq->isVisible()) {
+            QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(QRect(0, -faq->height(), faq->width(), faq->height()));
+            animation->setEndValue(QRect(0, 0, faq->width(), faq->height()));
+            animation->start();
+            settings->hide();
+            recordVideo->hide();
+            friends->hide();
+            settingsButton->hide();
+            recordVideoButton->hide();
+            profileButton->hide();
+            faq->show();
+            faq->raise();
+            faqButton->setIcon(QIcon(QDir(buildPath).filePath("icons/cross.png")));
+            faqButton->raise();
+        } else {
+            QPropertyAnimation *animation = new QPropertyAnimation(faq, "geometry");
+            animation->setDuration(100);
+            animation->setStartValue(friends->geometry());
+            animation->setEndValue(QRect(0, -faq->height(), faq->width(), faq->height()));
+            animation->start();
+            settingsButton->show();
+            recordVideoButton->show();
+            profileButton->show();
+            faqButton->setIcon(QIcon(faqIconPath));
+
+            QObject::connect(animation, &QPropertyAnimation::finished, [=]() {
+                faq->hide();
             });
         }
     });

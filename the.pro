@@ -14,12 +14,16 @@ icon.files += icons/record.png \
               icons/down_arrow.png \
               icons/up_arrow.png \
               icons/settings.png \
-              icons/profile.png
+              icons/profile.png \
+              icons/cross.png \
+              icons/liked.png \
+              icons/unliked.png
 
 # Add icon files to the build
 INSTALLS += icon
 
 SOURCES += \
+    faqlayout.cpp \
     random_time_generator.cpp \
     the_button.cpp \
     the_player.cpp \
@@ -30,6 +34,7 @@ SOURCES += \
     tomeo.cpp
 
 HEADERS += \
+    faqlayout.h \
     random_time_generator.h \
     record_video.h \
     the_button.h \
@@ -71,4 +76,7 @@ DISTFILES += \
     icons/record.png \
     icons/flip_light.png \
     icons/flip_dark.png \
-    icons/down_arrow.png
+    icons/down_arrow.png \
+    icons/cross.png \
+    icons/liked.png \
+    icons/unliked.png
