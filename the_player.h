@@ -24,6 +24,7 @@ private:
     long updateCount = 1; // start at 1 to ignore the users video
     RecordVideo *recordVideoInstance;
 
+
 public:
     ThePlayer(RecordVideo *recordVideo, QObject *parent = nullptr);
     ThePlayer() : QMediaPlayer(NULL) {
@@ -33,6 +34,7 @@ public:
 
     // all buttons have been setup, store pointers here
     void setContent(std::vector<TheButtonInfo>* i);
+    int getCurrentIndex ();
 
 
 private slots:
