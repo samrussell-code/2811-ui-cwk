@@ -30,9 +30,14 @@ void ThePlayer::playStateChanged (QMediaPlayer::State ms) {
     }
 }
 
+int ThePlayer::getCurrentIndex (){
+    return updateCount;
+}
+
 void ThePlayer::jumpTo (TheButtonInfo* button) {
     setMedia( * button -> url);
     play();
+    //resetLikeState();
 }
 
 void ThePlayer::nextVideo() {
@@ -66,12 +71,10 @@ void ThePlayer::previousVideo() {
 
 void ThePlayer::handleRecordingConfirmedChanged(bool confirmed) {
     qDebug()<< "reached event in the player" << Qt::endl;
-    // Update your logic to handle the recording confirmation change
-    // For example, stop skipping the first video when recording is confirmed
+
     if (confirmed) {
-        // Check if the current video is the 0th one and take appropriate action
+
         jumpTo(&infos->at(0));
         qDebug()<< "Showing the users video" << Qt::endl;
-        // Do something to handle not skipping the first video
     }
 }

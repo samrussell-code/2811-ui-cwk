@@ -92,9 +92,7 @@ std::vector<TheButtonInfo> getInfoIn (std::string loc) {
     return out;
 }
 
-
-
-
+std::vector<bool> likeStates;
 int main(int argc, char *argv[]) {
     // let's just check that Qt is operational first
     qDebug() << "Qt version: " << QT_VERSION_STR << endl;
@@ -114,6 +112,7 @@ int main(int argc, char *argv[]) {
     // collect all the videos in the folder
     std::vector<TheButtonInfo> videos;
 
+
     // Print out the argument passed to the application
     if (argc > 1) {
         qDebug() << "Argument passed to the application: " << argv[1] << endl;
@@ -126,6 +125,8 @@ int main(int argc, char *argv[]) {
         std::cout << std::string(argv[1]) ;
         videos = getInfoIn( std::string(argv[1]) );
     }
+
+    likeStates.resize(videos.size(), false); // create unliked for all videos
 
     if (videos.empty()) {
         QMessageBox::warning(
@@ -259,11 +260,28 @@ int main(int argc, char *argv[]) {
     ThePlayer *player = new ThePlayer(recordVideo);
     player->setVideoOutput(videoWidget);
     // Connect the down arrow button to a slot that changes the video
-    QObject::connect(upArrowButton, &QPushButton::clicked, [player]() { player->previousVideo(); });
-    QObject::connect(downArrowButton, &QPushButton::clicked, [player]() { player->nextVideo(); });
+
     // tell the player what videos are available
     player->setContent(&videos);
-    top->addWidget(videoWidget);
+
+    QPushButton *likeButton = new QPushButton(videoWidget);
+    QString likedIconFilename = "liked.png";
+    QString unlikedIconFilename = "unliked.png";
+    QString likedIconPath = QDir(buildPath).filePath("icons/" + likedIconFilename);
+    QString unlikedIconPath = QDir(buildPath).filePath("icons/" + unlikedIconFilename);
+    QIcon likedIcon = QIcon(likedIconPath);
+    QIcon unlikedIcon = QIcon(unlikedIconPath);
+    likeButton->setIcon(unlikedIcon);
+    likeButton->setIconSize(QSize(50, 50));
+    likeButton->setFlat(true);
+    likeButton->setGeometry(videoWidget->width() - 50, videoWidget->height() + 10, 50, 50);
+    QVBoxLayout *videoLayout = new QVBoxLayout;
+    videoLayout->addWidget(videoWidget);
+
+    // Add the like button to the video layout
+    videoLayout->addWidget(likeButton, 0, Qt::AlignBottom | Qt::AlignRight);
+
+    top->addLayout(videoLayout);
 
     // Add the down arrow button to the main window layout
     top->addWidget(downArrowButton);
@@ -322,6 +340,40 @@ int main(int argc, char *argv[]) {
         friends->setPalette(newPalette);
         window.setPalette(newPalette);
         window.setAutoFillBackground(true);
+    });
+
+
+
+
+    QObject::connect(upArrowButton, &QPushButton::clicked, [=, &player]() {
+
+        player->previousVideo();
+        int videoIndex = player->getCurrentIndex();
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        likeButton->setIcon(likeIcon);
+
+    });
+    QObject::connect(downArrowButton, &QPushButton::clicked, [=, &player]() {
+        player->nextVideo();
+        int videoIndex = player->getCurrentIndex();
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        likeButton->setIcon(likeIcon);
+    });
+
+    auto toggleLikeState = [=](int videoIndex) {
+        likeStates[videoIndex] = !likeStates[videoIndex];
+        qDebug() << likeStates[videoIndex] << videoIndex <<endl;
+        QIcon likeIcon = likeStates[videoIndex] ? QIcon(likedIconPath) : QIcon(unlikedIconPath);
+
+        likeButton->setIcon(likeIcon);
+    };
+
+    // Connect like button's click signal
+    QObject::connect(likeButton, &QPushButton::clicked, [=](){
+        int currentVideoIndex = player->getCurrentIndex();
+        toggleLikeState(currentVideoIndex);
     });
 
 
